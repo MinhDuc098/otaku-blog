@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link th:href="@{/style/login.css}" rel="stylesheet" >
+  <title>Login</title>
+</head>
+<body>
+<section>
+  <div class="form-box">
+    <div class="form-value">
+      <form action="#" th:action="@{./login}"  method="post" id="login">
+        <h2>Login</h2>
+        <h3 style="color: red; text-align: center" th:text="${session.message}" >  </h3>
+
+<!--        <h3 style="color: red; text-align: center" th:text="${session.email}" >  </h3>-->
+        <div class="inputbox">
+          <ion-icon name="mail-outline"></ion-icon>
+          <input type="password" th:name="password"  required>
+          <label for="">Password</label>
+        </div>
+        <div class="inputbox">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+          <input type="text" th:name="username"  required>
+          <label for="">Username</label>
+        </div>
+        <div class="forget">
+          <label for="">  <a th:href="@{./toforgotPassword}">Forgot Password</a></label>
+
+        </div>
+        <button>Log in</button>
+        <div class="register">
+          <p>Don't have a account <a href="#" onclick="showRegister()">Register</a></p>
+        </div>
+      </form>
+      <form action="#" th:action="@{./register}"  method="post" id="register" style="display:none">
+        <h2>Register</h2>
+        <h3 style="color: red; text-align: center" th:text="${session.mess}" >  </h3>
+        <div class="inputbox">
+          <ion-icon name="mail-outline"></ion-icon>
+          <input type="email" th:name="email" id="email" required>
+          <label for="">Email</label>
+        </div>
+        <div class="inputbox">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+          <input type="text" th:name="username"  required>
+          <label for="">Username</label>
+        </div>
+
+        <button onclick="passwordSend()">Register</button>
+        <button onclick="backToLogin()" style="margin-top:10px">Back To Login</button>
+      </form>
+    </div>
+  </div>
+</section>
+<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+<script>
+  function showRegister(){
+    document.getElementById('login').style.display = 'none'
+    document.getElementById('register').style.display = 'block'
+  }
+
+  function backToLogin(){
+    document.getElementById('login').style.display = 'block'
+    document.getElementById('register').style.display = 'none'
+  }
+
+  function passwordSend(){
+    var email = document.getElementById('email').value
+    alert("Your Password has been sent to "+ email)
+  }
+
+
+
+</script>
+</body>
+</html>

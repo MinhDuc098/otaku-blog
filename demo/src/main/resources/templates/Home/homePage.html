@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/header.html :: head">
+
+</head>
+
+<body style="background-color: #111111;">
+
+<!--nav bar -->
+<div th:insert="fragments/header.html :: navigationBar">
+
+</div>
+
+<!-- nav bar  -->
+
+<div class="container" style="padding: 25px; background-color: #2A2A2A; margin-top: 40px;">
+    <p  style="text-transform: uppercase; font-weight: bold; font-size: 20px; padding-bottom: 20px; color: azure;"> Bài viết nổi bật </p>
+    <div class="owl-carousel owl-theme" >
+        <div class="item " th:each="post:${posts}">
+            <a class="text-decoration-none"
+               style="padding: 10px"
+               th:href="@{./viewBlog?id={id}(id=${post.postId})}"
+               data-bs-toggle="tooltip" data-bs-placement="right"
+               th:title="${post.summary}"
+            >
+
+                <img  th:src="@{${post.postImg}}" alt="image" />
+                <h4 class="text-center text-decoration-none"
+                    style="padding: 10px;
+                           color: #f0e3e3"
+                    th:text="${post.postTitle}">
+                    Scathach
+                </h4>
+            </a>
+        </div>
+<!--        https://static.zerochan.net/Lancer.%28Fate.Grand.Order%29.full.2306349.jpg-->
+<!--        <div class="item ">-->
+<!--            <h4><img  src="https://c4.wallpaperflare.com/wallpaper/605/155/622/fate-grand-order-lancer-fate-grand-order-purple-hair-red-eyes-wallpaper-preview.jpg" alt="image" /></h4>-->
+<!--        </div>-->
+<!--        <div class="item ">-->
+<!--            <h4><img  src="https://i.pinimg.com/originals/ea/9d/0d/ea9d0d7fa95ee5eac6a8f3b85d2087c0.jpg" alt="image" /></h4>-->
+<!--        </div>-->
+<!--        <div class="item ">-->
+<!--            <h4><img  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKub2gSsiZMCzxGwtIphM-EFd7pLELuMQ4T-L6L5KpajoDMrex3PvgGs4E2xDPWcW5g9k&usqp=CAU" alt="image" /></h4>-->
+<!--        </div>-->
+<!--        <div class="item ">-->
+<!--            <h4><img  src="https://c4.wallpaperflare.com/wallpaper/390/527/619/fate-grand-order-scathach-fate-grand-order-anime-girls-big-boobs-miniskirt-hd-wallpaper-preview.jpg" alt="image" /></h4>-->
+<!--        </div>-->
+<!--        <div class="item ">-->
+<!--            <h4><img  src="" alt="image" /></h4>-->
+<!--        </div>-->
+<!--        <div class="item ">-->
+<!--            <h4><img  src="https://www.animelovepillow.com/wp-content/uploads/2020/11/fategrand-order-sca%CC%81thach-fate-1095-1.jpg" alt="image" /></h4>-->
+<!--        </div>-->
+<!--        <div class="item ">-->
+<!--            <h4><img  src="images/pexels-photo-257360.jpeg" alt="image" /></h4>-->
+<!--        </div>-->
+<!--        <div class="item ">-->
+<!--            <h4><img  src="data:image/jpeg;base64,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" alt="image" /></h4>-->
+<!--        </div>-->
+<!--        <div class="item ">-->
+<!--            <h4><img  src="https://i.pinimg.com/originals/03/41/d9/0341d90db663a9575ba32a781dc4a1a9.jpg" alt="image" /></h4>-->
+<!--        </div>-->
+<!--        <div class="item ">-->
+<!--            <h4><img  src="https://cdn.donmai.us/original/c4/f9/c4f9b9465419385bdef89fabfbac00ae.jpg" alt="image" /></h4>-->
+<!--        </div>-->
+<!--        <div class="item ">-->
+<!--            <h4><img  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRq4mqUtlwxhAhIixgFrFnb5NhkL-yAwbR85vWHBoSL-d9_17j1Z01zIYlR98m6aGgzNP0&usqp=CAU" alt="image" /></h4>-->
+<!--        </div>-->
+    </div>
+</div>
+<!--end slider -->
+<div  class="container" style="margin-top: 3%;">
+    <div class="row">
+        <!-- Items in main home page  -->
+        <div class="col-md-8 " style="background-color: #2A2A2A;">
+            
+                <!-- item 1 -->
+                <a class="row text-decoration-none" th:each="post:${posts}" style="padding: 15px;" th:href="@{./viewBlog?id={id}(id=${post.postId})}">
+
+                <div class="col-md-3" style="margin-bottom: 4%;">
+
+                    <img style="height: 100%;" class="img-fluid" th:src="@{${post.postImg}}" alt="">
+                </div>
+<!--            https://i.pinimg.com/originals/38/c2/f4/38c2f488315955c0bb8423f4d3367e71.jpg-->
+                <div class="col-md-9">
+<!--                    <p class="text-uppercase" style="color: rgba(233, 225, 225, 0.904);"> romance </p>-->
+                    <div th:each="cate:${post.listCategory}" style="display: inline;">
+                        <span style="color: rgba(232,221,221,0.68); font-size: 18px; margin-right: 8%" th:text="${cate.categoryName} "> </span>
+
+                    </div>
+                    <p class="text-title title" style="color: whitesmoke; font-size: 28px;" th:text="${post.postTitle}">  </p>
+                    <p class="text-light" th:text="${post.summary}"> The .NET Core SDK cannot be located: A valid dotnet installation could not be found. .NET Core debugging will not be enabled. Make sure the .NET Core SDK is installed and is on the path. </p>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <img class="rounded-circle img-fluid" src="https://www.aussietreesolutions.com.au/wp-content/uploads/2018/08/facts-about-trees-1037x675.jpg" alt="">
+                        </div>
+                        <div class="col-md-5">
+                            <p class="text-light text-capitalize" style="margin-bottom: 0px" th:text="${post.user.userName}"> Nguyễn Minh Đức </p>
+                            <p class="text-light text-capitalize" th:text="${post.createdAt}">  </p>
+                        </div>
+                        <div class="col-md-2">
+
+                            <p class="text-light text-end text-center" style="border-radius: 25px; background-color: rgba(15, 161, 161, 0.951);"> <span th:text="${post.upVote}"> 5 </span> Upvote</p>
+
+                        </div>
+                        <div class="col-md-3">
+                            <p class="text-light text-end text-center" style="border-radius: 25px; background-color: rgb(234, 12, 12);"> <span> 3 </span> Comment</p>
+                        </div>
+                    </div>
+                </div>
+
+				</a>
+        
+				
+
+                <!--end item1  -->
+
+
+                <div class="col-md-12">
+                    <ul class="pagination justify-content-end" >
+                        <li th:if="${currentPage!= 0}">
+                            <a class="page-link" th:href="@{./home?pageNo={pageNo}(pageNo=${currentPage-1})}">Previous</a>
+                        </li>
+                        <li th:each="index : ${#numbers.sequence(0,numPage-1)}" th:class="${index == currentPage?'active':''}">
+                            <a class="page-link"  th:text="${index+1}"  th:href="@{./home?pageNo={pageNo}(pageNo=${index})}"></a>
+                        </li>
+                        <li th:if="${currentPage!= numPage-1}">
+                            <a class="page-link" th:href="@{./home?pageNo={pageNo}(pageNo=${currentPage+1})}">Next</a>
+                        </li>
+                    </ul>
+                </div>
+
+
+                <div class="col-md-12" style="border-top: #f0e3e3 solid 1px;border-bottom: #f0e3e3 solid 1px;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p style="color: #f4f4f4e6;font-weight: bold;font-size: 26px; padding: 3% 0%; ">
+                                Otaku-Forum
+                            </p>
+                            <p class="text-light">
+                                Website được thiết kể và quản lý bởi Nguyễn Minh Đức 1 thực tập sinh web developer
+                            </p>
+                        </div>
+
+                        <div class="col-md-6">
+                            <p style="color: #f4f4f4e6;font-weight: bold;font-size: 26px;padding: 4% 0%; ">
+                                Liên Hệ
+                            </p>
+                            <p class="text-light"> <span style="font-weight: bold;">SĐT</span> : 0814494436 </p>
+                            <p class="text-light"><span style="font-weight: bold;">Email</span> : nguyenminhduc28112002@gmail.com </p>
+                            <p class="text-light"> <span style="font-weight: bold;">Address</span>: Thạch Hòa - Thạch Thất</p>
+                            <p class="text-light"> <span style="font-weight: bold;">Facebook</span>: <a href="https://www.facebook.com/kirito.karuto.71/">https://www.facebook.com/kirito.karuto.71/</a> </p>
+                            <p class="text-light"> <span style="font-weight: bold;">My github</span>:  </p>
+                        </div>
+                    </div>
+                </div>
+            
+
+        </div>
+        <!-- end items -->
+
+        <!-- list author -->
+        <div class="col-md-4" style="background-color: #2A2A2A; border-left: #111111 solid 10px;">
+            <div class="row" style="padding: 15px;">
+                <div class="col-md-12">
+                    <p class="text-transform text-light text-uppercase fs-4"  style="font-weight: bold;" > Các cây viết nổi bật </p>
+                </div>
+                <div class="row" th:each="user:${users}" style="margin-bottom:20px ">
+                <div class="col-md-3">
+                    <img class="rounded-circle img-fluid" src=" /img/alexia.jpg" alt="">
+                </div>
+<!--                    https://www.aussietreesolutions.com.au/wp-content/uploads/2018/08/facts-about-trees-1037x675.jpg-->
+                <div class="col-md-5">
+                    <p class="text-light" style="font-weight: bold;margin-bottom: 5px" th:text="${user.userName}"> Nguyễn Minh Đức </p>
+                    <p style="color: rgb(198, 196, 196);" th:text="${user.userDescription}"> just some random guy on the internet </p>
+                </div>
+
+                <div class="col-md-4">
+                    <button class="btn btn-light btn-outline-dark w-100" style="border-radius: 25px;"> Follow  </button>
+                </div>
+                </div>
+            </div>
+
+            <div class="row" style="border-top: #111111 solid 10px;">
+                <div class="col-md-12" style="padding: 3%;">
+                    <p class="text-light fs-4" style="font-weight: bold;">
+                        NHỮNG BÀI VIẾT NỔI BẬT BẠN KHÔNG NÊN BỎ LỠ!
+                    </p>
+                    <p class="text-light">
+                        Thứ Năm hàng tuần, Otaku-Forum sẽ gửi bạn email tổng hợp những bài viết đáng đọc nhất tuần qua.
+                    </p>
+
+                    <form class="form-control" action="" style="background-color: #2A2A2A; border:none;padding: 0px; margin-top: 10%;" >
+                        <label for="" class="text-light" style="padding-bottom: 8px;">
+                            Email mà bạn có thể nhận thông báo:
+                        </label>
+                        <input type="email" class="form-control" placeholder="Otaku-Forum@gmail.com" style="margin-bottom: 15px; border-radius: 25px;" required>
+                        <label for="" class="text-light" style="padding-bottom: 8px; ">
+                            Tên bạn là:
+                        </label>
+                        <input type="text" class="form-control" style="margin-bottom: 15px; border-radius: 25px;" required>
+
+                        <button type="submit" class="btn btn-light btn-outline-secondary" style="border-radius: 25px; padding: 7px 20px;">
+                            Đăng Ký
+                        </button>
+                    </form>
+
+                    <div class="col-md-12">
+                        <div class="d-flex justify-content-center align-item-center toTop" style="padding-top: 20%;">
+                            <a href="#">
+                                <button style='font-size:50px; border-radius:25px;' class="btn btn-light btn-outline-dark">
+
+                                    <i class='far fa-hand-point-up' style="padding: 5%;"></i>
+
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- end list author -->
+
+
+    </div>
+
+
+</div>
+<script>
+
+
+</script>
+<div th:insert="fragments/footer.html :: footer">
+
+</div>
+

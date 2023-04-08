@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="fragments/header.html :: head">
+
+
+</head>
+<body style="background-color: #111111;">
+<div th:insert="fragments/header.html :: navigationBar"></div>
+
+    <!-- end slider -->
+    <div class="container" style="background-color: #2A2A2A; margin-top: 100px;">
+        <div style="width: 50%;margin-left: auto; margin-right: auto; padding-top: 50px; padding-bottom: 60px;" >
+<!--                <img th:src="@{${post.postImg}}" alt="">-->
+                <div th:each="cate:${post.listCategory}" style="display: inline;">
+                <span style="color: rgba(232,221,221,0.68); font-size: 18px; margin-right: 8%" th:text="${cate.categoryName} "> </span>
+
+                </div>
+                <h1 class="text-justify" style="color: rgb(232, 221, 221); margin-top: 20px" th:text="${post.postTitle}">   </h1>
+
+                <p style="color: rgb(198, 196, 196); font-size: 18px;padding-bottom: 3%;" class="fst-italic" th:text="${post.summary}">
+
+                </p>
+                <div class="row" style="margin-bottom: 7%;">
+                        <img class="rounded-circle col-md-2 img-fluid"   src="https://www.aussietreesolutions.com.au/wp-content/uploads/2018/08/facts-about-trees-1037x675.jpg" alt="">
+                        <div class="col-md-5">
+                                <p style="color: rgb(232, 221, 221);margin-bottom: 0px;font-weight: bold;"  th:text="${user.userName}">  </p>
+                                <p style="color: rgba(232, 221, 221, 0.493); margin-top: 0px;" th:text="${post.createdAt}"> </p>
+                        </div>
+                        <div class="col-md-5 text-light text-end upvote-downvote">
+                                <a th:href="@{./upvote?id={id}(id=${post.postId})}" data-bs-toggle="tooltip" data-bs-placement="top" title="upvote" style="margin: 5px; color: #eae7e748;">
+                                        <i class="far fa-caret-square-up" style="font-size: 33px;"></i>
+                                </a>
+                                <span class="d-flex justify-content-end" style="margin-right: 12px;" th:text="${vote}">
+
+                                </span>
+                                <a th:href="@{./downvote?id={id}(id=${post.postId})}" data-bs-toggle="tooltip" data-bs-placement="top" title="downvote" style="margin: 5px; color: #eae7e748;">
+                                        <i class="far fa-caret-square-down" style="font-size: 33px;"></i>
+                                </a>
+
+                        </div>
+
+                </div>
+                <div class="text-justify" style="color: rgb(245, 239, 239);
+                                                 letter-spacing: 2px;
+                                                 font-size: 16px;"
+
+                th:utext="${contentHtml}">
+
+                </div>
+                <div class="text-justify" style="color: rgb(245, 239, 239);
+                                                 letter-spacing: 2px;
+                                                 font-size: 16px;
+                                                margin-bottom: 40px"
+
+                     th:text="${contentText}">
+
+                </div>
+                
+        </div>
+    </div>
+    <script>
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    </script>
+</body>
+</html>
