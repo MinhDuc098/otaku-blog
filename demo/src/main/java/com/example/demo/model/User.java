@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -39,15 +40,51 @@ public class User {
     private String userDescription;
 
     @Column(name = "user_img")
-    private String userImg;
+        private String userImg;
 
     @Column(name = "user_date_of_birth")
 
     private LocalDateTime userDateOfBirth;
 
+    @Column(name = "user_Notification")
+    private int userNotification;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Post> post = new HashSet<>();
 
+    @OneToMany(mappedBy = "user",  cascade = CascadeType.ALL)
+    private Set<Comment> comments = new HashSet<>();
+
+
+    @OneToMany(mappedBy = "user",  cascade = CascadeType.ALL)
+    private Set<Report> reports = new HashSet<>();
+
+
+    @OneToMany(mappedBy = "reportingUser")
+    private List<ReportUser> reportsMade;
+
+    @OneToMany(mappedBy = "reportedUser")
+    private List<ReportUser> reportsReceived;
+
+    @OneToMany(mappedBy = "userReceiverNotification")
+    private List<Notification> notifications;
+
+
+    public Set<Report> getReports() {
+        return reports;
+    }
+
+    public void setReports(Set<Report> reports) {
+        this.reports = reports;
+    }
+
+    public Set<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
+    }
 
     public Integer getUserId() {
         return this.userId;
@@ -127,5 +164,37 @@ public class User {
 
     public void setPost(Set<Post> post) {
         this.post = post;
+    }
+
+    public int getUserNotification() {
+        return userNotification;
+    }
+
+    public void setUserNotification(int userNotification) {
+        this.userNotification = userNotification;
+    }
+
+    public List<ReportUser> getReportsMade() {
+        return reportsMade;
+    }
+
+    public void setReportsMade(List<ReportUser> reportsMade) {
+        this.reportsMade = reportsMade;
+    }
+
+    public List<ReportUser> getReportsReceived() {
+        return reportsReceived;
+    }
+
+    public void setReportsReceived(List<ReportUser> reportsReceived) {
+        this.reportsReceived = reportsReceived;
+    }
+
+    public List<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(List<Notification> notifications) {
+        this.notifications = notifications;
     }
 }

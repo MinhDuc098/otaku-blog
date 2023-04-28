@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/header.html :: head">
+
+</head>
+<body style="background-color: #111111;">
+
+<div class="container" style="padding: 25px; background-color: #2A2A2A; margin-top: 40px;">
+  <h1 class="text-light">
+    Thông Báo Admin
+  </h1>
+</div>
+
+<div class="container"style="padding: 0px;  margin-top: 40px;background-color: #2A2A2A" >
+  <div class="row text-light" >
+      <div class="col-md-6" style=" padding: 20px; border-right: 10px solid #111111 ">
+
+        <h1 style="margin-bottom: 26px"> Thông báo Về User </h1>
+
+        <div class="row" style="margin-bottom: 20px" th:each="reportUser:${reportUsers}">
+
+          <div class="col-md-2" >
+            <img  style="border-radius: 50px; height: 65px; width: 65px"  th:src="${reportUser.reportingUser.userImg}" alt="">
+          </div>
+
+          <div class="col-md-8">
+
+            tài khoản
+            <span class="fw-bold" th:text="${reportUser.reportingUser.userName}">  </span>
+            (id =
+            <span th:text="${reportUser.reportingUser.userId}"></span>
+            )
+            đã report Tài khoản
+            <a class="text-decoration-none" th:href="@{./searchUserById(userId = ${reportUser.reportedUser.userId})}" th:text="${reportUser.reportedUser.userName}"></a>
+            vì:
+            <span class="fw-bold" th:text="${reportUser.reason}"></span>
+            <p style="font-size: 15px; color: rgba(192, 187, 187, 0.899)" th:text="${reportUser.createdAt}">  </p>
+          </div>
+
+          <div class="col-md-2">
+          <a th:href="@{./deleteReportUser(reportUserId = ${reportUser.id})}">
+            <button class="btn btn-success">
+              Delete
+            </button>
+          </a>
+        </div>
+
+        </div>
+
+      </div>
+
+
+    <div class="col-md-6 " style="padding: 20px;border-left: 10px solid #111111">
+      <h1 style="margin-bottom: 26px"> Thông báo Về Post </h1>
+
+      <div class="row" style="margin-bottom: 20px" th:each="report:${reports}">
+
+        <div class="col-md-2" >
+          <img  style="border-radius: 50px; height: 65px; width: 65px"  th:src="${report.user.userImg}" alt="">
+        </div>
+
+
+        <div class="col-md-8">
+
+          tài khoản
+          <span class="fw-bold" th:text="${report.user.userName}">  </span>
+          (id =
+          <span th:text="${report.user.userId}"></span>
+          )
+          đã report bài viết
+          <a th:href="@{../viewBlog(id=${report.post.postId})}" th:text="${report.post.postTitle}"></a>
+          của tác giả:
+          <a class="text-decoration-none" th:href="@{./searchUserById(userId = ${report.post.user.userId})}" th:text="${report.post.user.userName}"></a>
+
+          vì:
+          <span class="fw-bold" th:text="${report.reportReason}"></span>
+          <p style="font-size: 15px; color: rgba(192, 187, 187, 0.899)" th:text="${report.createdAt}">  </p>
+      </div>
+
+      <div class="col-md-2">
+        <a th:href="@{./deleteReportPost(reportPostId = ${report.reportId})}">
+        <button class="btn btn-primary">
+          Delete
+        </button>
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="col-md-12" style="border-top: #111111 10px solid; background-color: #111111">
+    <a th:href="@{../home}">
+      <button class="btn btn-dark">
+        Back to Home
+      </button>
+    </a>
+  </div>
+</div>
+
+</body>
+</html>

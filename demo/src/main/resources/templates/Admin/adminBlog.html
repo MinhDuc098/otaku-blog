@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header.html :: head">
+
+</head>
+<body style="background-color: #111111;">
+
+<div class="container" style="padding: 25px; background-color: #2A2A2A; margin-top: 40px;">
+    <h1 class="text-light">
+        Quản Lý Post
+    </h1>
+</div>
+
+<div class="container" style="padding: 25px; background-color: #2A2A2A; margin-top: 40px;">
+
+  <div class="row text-decoration-none" th:each="post:${posts}" style="padding: 15px;">
+
+      <div class="col-md-2" style="margin-bottom: 4%;">
+
+        <img style="height: 100%;" class="img-fluid" th:src="@{${post.postImg}}" alt="">
+      </div>
+
+      <div class="col-md-10">
+        <div th:each="cate:${post.listCategory}" style="display: inline;">
+          <span style="color: rgba(232,221,221,0.68); font-size: 18px; margin-right: 8%" th:text="${cate.categoryName} "> </span>
+
+        </div>
+        <a class="text-title title text-decoration-none" style="color: whitesmoke; font-size: 28px;display: block" th:text="${post.postTitle}"  th:href="@{../viewBlog?id={id}(id=${post.postId})}">
+        </a>
+        <p class="text-light" th:text="${post.summary}"> The .NET Core SDK cannot be located: A valid dotnet installation could not be found. .NET Core debugging will not be enabled. Make sure the .NET Core SDK is installed and is on the path. </p>
+        <div class="row">
+          <div class="col-md-1">
+            <img class="rounded-circle img-fluid" th:src="@{${post.user.userImg}}" alt="">
+          </div>
+          <div class="col-md-4">
+            <p class="text-light text-capitalize" style="margin-bottom: 0px" th:text="${post.user.userName}"> Nguyễn Minh Đức </p>
+            <p class="text-light text-capitalize" th:text="${post.createdAt}">  </p>
+          </div>
+          <div class="col-md-2">
+
+            <p class="text-light text-end text-center" style="border-radius: 25px;padding: 5px; background-color: rgba(15, 161, 161, 0.951);"> <span th:text="${post.upVote}">  </span> Upvote</p>
+
+          </div>
+          <div class="col-md-2">
+            <p class="text-light text-end text-center" style="border-radius: 25px; background-color: rgb(234, 12, 12);"> <span th:text="${post.comments.size()}"> 3 </span> Comment</p>
+          </div>
+
+            <div class="col-md-3">
+                <a th:href="@{./adminDeletePost?id={id}(id=${post.postId})}">
+                <button class="btn btn-danger">
+                    Delete
+                </button>
+                </a>
+            </div>
+        </div>
+      </div>
+
+  </div>
+<!--pagination index-->
+    <div class="col-md-12" th:if="${category==null}">
+        <ul class="pagination justify-content-end" th:if="${numPage>0}">
+            <li th:if="${currentPage!= 0}">
+                <a class="page-link" th:href="@{./managePost?pageNo={pageNo}(pageNo=${currentPage-1})}">Previous</a>
+            </li>
+            <li th:each="index : ${#numbers.sequence(0,numPage-1)}" th:class="${index == currentPage?'active':''}">
+                <a class="page-link"  th:text="${index+1}"  th:href="@{./managePost?pageNo={pageNo}(pageNo=${index})}"></a>
+            </li>
+            <li th:if="${currentPage!= numPage-1}">
+                <a class="page-link" th:href="@{./managePost?pageNo={pageNo}(pageNo=${currentPage+1})}">Next</a>
+            </li>
+        </ul>
+    </div>
+
+    <div>
+        <a th:href="@{../home}">
+        <button class="btn btn-success">
+            Back to Home
+        </button>
+        </a>
+    </div>
+    <!-- end pagination index-->
+</div>
+</body>
+</html>

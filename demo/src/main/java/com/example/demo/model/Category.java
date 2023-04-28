@@ -16,7 +16,7 @@ public class Category {
     @Column(name = "category_name")
     private String categoryName;
 
-    @ManyToMany(mappedBy = "listCategory")
+    @ManyToMany(mappedBy = "listCategory",cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<Post> listPost = new HashSet<>();
 
     public Set<Post> getListPost() {

@@ -74,6 +74,7 @@
         .title:hover{
             opacity: 0.6;
         }
+
     /*    */
          
     </style>
@@ -127,10 +128,55 @@
                         <li class="nav-item" th:if="${session.email != null}" style="margin-left: 20px">
                             <a class="nav-link" th:href="@{./toWriteBlog}"> <i class="	fas fa-edit" style="color:rgb(226, 215, 215)" ></i> Viết Bài</a>
                         </li>
+
+                        <li class="dropdown nav-item"  style="margin-left: 20px" th:if="${session.userID != null}">
+                            <a  class="nav-link dropdown-toggle" href="" data-bs-toggle="dropdown"
+                            th:text="${session.userAuthor == 5?'Admin':'User'}">
+                               Admin
+                            </a>
+                            <ul class="dropdown-menu bg-dark" id="admin" style="background-color: #1a1a1a">
+
+                                <li th:if="${session.userAuthor == 5}"><a class="dropdown-item" th:href="@{./admin/manageUserAccount}" style="color: rgba(245,245,245,0.93); padding: 10px"> <i class="fas fa-users"></i> Quản Lý User Account  </a></li>
+
+                                <li th:if="${session.userAuthor == 5}"><a class="dropdown-item" th:href="@{./admin/managePost}" style="color: rgba(245,245,245,0.93); padding: 10px"><i class="fas fa-clipboard"></i> Quản Lý Blog</a></li>
+            <!-- thông báo cho admin -->
+                                <li th:if="${session.userAuthor == 5}">
+                                    <a class="dropdown-item" th:href="@{./admin/adminNotification}" style="color: rgba(245,245,245,0.93); padding: 10px">
+                                        <i class="far fa-bell"></i>
+                                        Thông Báo
+                                        <span style="border-radius: 50px;
+                                                     background-color: darkred;
+                                                     padding: 5px 9px;
+                                                     margin-left: 10px"
+                                              th:text="${userNotify}">
+                                            1
+                                        </span>
+                                    </a>
+                                </li>
+            <!-- thông báo cho user-->
+                                <li th:if="${session.userAuthor < 5}">
+                                    <a class="dropdown-item" href="" style="color: rgba(245,245,245,0.93); padding: 10px">
+                                        <i class="far fa-bell"></i>
+                                        Thông Báo
+                                        <span style="border-radius: 50px;
+                                                     background-color: darkred;
+                                                     padding: 5px 9px;
+                                                     margin-left: 10px"
+                                              th:text="${userNotify}">
+                                            1
+                                        </span>
+                                    </a>
+                                </li>
+
+                                <li th:if="${session.userAuthor == 5}"><a class="dropdown-item" href="#" style="color: rgba(245,245,245,0.93); padding: 10px"><i class="fas fa-cog"></i>  Quản Lý cài đặt Website</a></li>
+
+                                <li><a class="dropdown-item" href="#" style="color: rgba(245,245,245,0.93); padding: 10px"><i class="far fa-comments"></i>  Chat</a></li>
+                            </ul>
+                        </li>
                     </ul>
-                    <form class="d-flex">
-                        <input class="form-control me-2" type="text" placeholder="Search">
-                        <button class="btn btn-light btn-outline-success" type="button">Search</button>
+                    <form class="d-flex" th:action="@{./search}"  method="post">
+                        <input class="form-control me-2" type="text" name="name" placeholder="Search">
+                        <button class="btn btn-light btn-outline-success" type="submit">Search</button>
                     </form>
                 </div>
             </div>

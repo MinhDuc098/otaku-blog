@@ -21,19 +21,19 @@ public class BlogController {
     private BlogService viewBlogService;
 
     @GetMapping(path = "/viewBlog")
-    public String viewBlog(@RequestParam int id, Model model){
-        return viewBlogService.viewPost(id,model);
+    public String viewBlog(@RequestParam int id,Model model,HttpSession session){
+        return viewBlogService.viewPost(id,model,session);
     }
 
 
     @GetMapping(path = "/upvote")
-    public String upvote(@RequestParam int id, RedirectAttributes attributes,HttpSession session){
-        return viewBlogService.upvote(id,attributes,session);
+    public String upvote(@RequestParam int id , RedirectAttributes attributes,HttpSession session,Model model){
+        return viewBlogService.upvote(id,attributes,session,model);
     }
 
     @GetMapping(path = "/downvote")
-    public String downvote(@RequestParam int id, RedirectAttributes attributes,HttpSession session){
-        return viewBlogService.downvote(id,attributes,session);
+    public String downvote(@RequestParam int id , RedirectAttributes attributes,HttpSession session,Model model){
+        return viewBlogService.downvote(id,attributes,session,model);
     }
 
     @GetMapping(path = "/toWriteBlog")
@@ -47,9 +47,27 @@ public class BlogController {
     }
 
     @GetMapping(path = "/toYourBlog")
-    public String toYourBlog(Model model, HttpSession session){
-        return viewBlogService.toYourBlog( model,  session);
+    public String toYourBlog(Model model, HttpSession session, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "3") int pageSize){
+        return viewBlogService.toYourBlog( model, session,pageNo,pageSize);
     }
+
+    @GetMapping(path = "/deleteYourPost")
+    public String deleteYourPost(@RequestParam int id,HttpSession session){
+        return viewBlogService.deleteYourPost(id,session);
+    }
+
+    @GetMapping(path = "/toAuthorBlog")
+    public String toAuthorBlog(@RequestParam int authorId,Model model, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize,HttpSession session){
+
+        return viewBlogService.toAuthorBlog(authorId,model,pageNo,pageSize,session);
+    }
+
+    @PostMapping(path = "/ReportPost")
+    public String toReportPost(int id,String reason, HttpSession session, Model model,RedirectAttributes attributes ){
+        return viewBlogService.ReportPost(id,reason,session,model,attributes);
+    }
+
+
 }
 
 

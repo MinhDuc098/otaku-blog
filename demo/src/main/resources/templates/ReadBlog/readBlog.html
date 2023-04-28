@@ -4,7 +4,6 @@
 
 <head th:insert="fragments/header.html :: head">
 
-
 </head>
 <body style="background-color: #111111;">
 <div th:insert="fragments/header.html :: navigationBar"></div>
@@ -23,20 +22,37 @@
 
                 </p>
                 <div class="row" style="margin-bottom: 7%;">
-                        <img class="rounded-circle col-md-2 img-fluid"   src="https://www.aussietreesolutions.com.au/wp-content/uploads/2018/08/facts-about-trees-1037x675.jpg" alt="">
+                    <img class="col-md-2 rounded-circle img-fluid" th:src="@{${user.userImg}}" alt="">
                         <div class="col-md-5">
-                                <p style="color: rgb(232, 221, 221);margin-bottom: 0px;font-weight: bold;"  th:text="${user.userName}">  </p>
+                                <a class="text-decoration-none" th:href="@{./toAuthorBlog(authorId=${user.userId})}" style="color: rgb(232, 221, 221);margin-bottom: 0px;font-weight: bold;"  th:text="${user.userName}">  </a>
                                 <p style="color: rgba(232, 221, 221, 0.493); margin-top: 0px;" th:text="${post.createdAt}"> </p>
                         </div>
                         <div class="col-md-5 text-light text-end upvote-downvote">
-                                <a th:href="@{./upvote?id={id}(id=${post.postId})}" data-bs-toggle="tooltip" data-bs-placement="top" title="upvote" style="margin: 5px; color: #eae7e748;">
-                                        <i class="far fa-caret-square-up" style="font-size: 33px;"></i>
+                                <a th:if="${voteStatus == null}" th:href="@{./upvote(id=${post.postId})}" data-bs-toggle="tooltip" data-bs-placement="top" title="upvote" style="margin: 5px; color: #eae7e748;" >
+                                        <i class="far fa-caret-square-up"  style="font-size: 33px;"></i>
                                 </a>
+
+                                <a th:if="${voteStatus == 'down'}" th:href="@{./upvote(id=${post.postId})}" data-bs-toggle="tooltip" data-bs-placement="top" title="upvote" style="margin: 5px; color: #eae7e748;" >
+                                        <i class="far fa-caret-square-up"  style="font-size: 33px;"></i>
+                                </a>
+
+                                <a th:if="${voteStatus == 'up'}" th:href="@{./upvote(id=${post.postId})}" data-bs-toggle="tooltip" data-bs-placement="top" title="upvote" style="margin: 5px; color: #eae7e748;" >
+                                        <i class="far fa-caret-square-up" style="font-size: 33px; color:red;"></i>
+                                </a>
+
                                 <span class="d-flex justify-content-end" style="margin-right: 12px;" th:text="${vote}">
 
                                 </span>
-                                <a th:href="@{./downvote?id={id}(id=${post.postId})}" data-bs-toggle="tooltip" data-bs-placement="top" title="downvote" style="margin: 5px; color: #eae7e748;">
+                                <a th:if="${voteStatus == null}" th:href="@{./downvote(id=${post.postId})}" data-bs-toggle="tooltip" data-bs-placement="top" title="downvote" style="margin: 5px; color: #eae7e748;" >
                                         <i class="far fa-caret-square-down" style="font-size: 33px;"></i>
+                                </a>
+
+                                <a th:if="${voteStatus == 'up'}" th:href="@{./downvote(id=${post.postId})}" data-bs-toggle="tooltip" data-bs-placement="top" title="downvote" style="margin: 5px; color: #eae7e748;" >
+                                        <i class="far fa-caret-square-down" style="font-size: 33px;"></i>
+                                </a>
+
+                                <a th:if="${voteStatus == 'down'}" th:href="@{./downvote(id=${post.postId})}" data-bs-toggle="tooltip" data-bs-placement="top" title="downvote" style="margin: 5px; color: #eae7e748;" >
+                                        <i class="far fa-caret-square-down"  style="font-size: 33px;color: red"></i>
                                 </a>
 
                         </div>
@@ -57,14 +73,125 @@
                      th:text="${contentText}">
 
                 </div>
-                
+            <div class="d-flex justify-content-end">
+
+                <button class=" btn btn-outline-success" style="margin-top: 40px; overflow: auto;" onclick="showFormReport()">
+                    report
+                </button>
+
+
+            </div>
+<!--            form report-->
+            <div class="container d-flex justify-content-center"
+                 style="margin-top: 8%;
+                        margin-bottom: 8%;
+                        padding: 20px;
+                       "
+
+
+            >
+                <form th:action="@{./ReportPost}"
+                      id="formReport"
+                      class="form-control"
+                      style="background-color: #2A2A2A;
+                             padding: 20px;
+                             display: none"
+                      method="post" >
+
+                    <h2 class="text-light text-center" > What's wrong with this post</h2>
+                    <textarea class="form-control bg-dark text-light"
+                              style="resize: none;
+                                     padding: 20px;
+                                     margin-bottom: 20px;
+                                     margin-top: 20px;"
+                              rows="7"
+                              name="reason"
+                    >
+
+                    </textarea>
+                    <input type="text" name="id" th:value="${post.postId}" hidden>
+                    <button type="submit" class="btn btn-success btn-outline-dark text-uppercase" onclick="successFull()"> submit </button>
+                    <button type="button" class="btn btn-danger text-uppercase" onclick="closeFormReport()"> cancel  </button>
+                </form>
+            </div>
+<!--            form report-->
         </div>
     </div>
+<!--Comment-->
+<div class="container text-light" style="background-color: #2A2A2A; margin-top: 60px; padding: 30px;">
+    <h1> Comment </h1>
+    <form th:if="${session.userID != null}" class="row" style="margin-top: 40px;"  th:action="@{./addComment}" th:object="${comment}" method="post">
+        <div class="col-md-1">
+            <img class="rounded-circle  img-fluid"   th:src="@{${session.userImg}}" alt="">
+        </div>
+        <div class="col-md-3">
+            <p style="color: rgb(232, 221, 221);margin-bottom: 0px;font-weight: bold;"  th:text="${session.userName}">  </p>
+<!--            <input  name="userId" th:value="${session.userID}" hidden>-->
+            <input   th:value="${post.postId}" name="id" hidden>
+
+        </div>
+
+
+        <textarea class="col-md-7 form-control w-50"
+                  style="resize: none;
+                                        background-color: #111111;
+                                        color: aliceblue;
+                                        border-radius: 50px;
+                                        padding: 20px;"
+                  rows="5"
+                  th:field="*{commentContent}">
+        </textarea>
+        <div class="col-md-10 text-end" style="margin-top: 10px; border-radius: 50px;">
+            <button class="btn btn-light btn-outline-dark w-20" type="submit"> Đăng bình luận </button>
+        </div>
+
+    </form>
+
+    <div class="row" style="margin-top: 60px;" th:each="comment:${commentList}">
+        <div class="col-md-1">
+            <img class="rounded-circle  img-fluid"   th:src="@{${comment.user.userImg}}" alt="">
+        </div>
+        <div class="col-md-3">
+            <p style="color: rgb(232, 221, 221);margin-bottom: 0px;font-weight: bold;" th:text="${comment.user.userName}"> tên tác giả </p>
+            <p style="color: rgba(232, 221, 221, 0.493);
+                      margin-top: 0px;"
+               th:text="${comment.createdAt}">
+
+            </p>
+        </div>
+        <div class="col-md-7 form-control w-50 "
+             style="background-color: #111111;
+                    color: aliceblue;
+                    border-radius: 50px;
+                    padding: 20px;"
+             th:text="${comment.commentContent}"
+        >
+
+        </div>
+
+    </div>
+
+
+</div>
     <script>
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
     </script>
+
+<script>
+    function showFormReport(){
+        document.getElementById("formReport").style.display = "block";
+    }
+
+    function closeFormReport(){
+        document.getElementById("formReport").style.display = "none";
+    }
+    function successFull(){
+        confirm("Report Successfull");
+    }
+
+</script>
 </body>
 </html>

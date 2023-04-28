@@ -43,7 +43,7 @@ public class Post {
 
 
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "cate_post",
             joinColumns = @JoinColumn(name = "post_id"),
@@ -56,6 +56,28 @@ public class Post {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "post",  cascade = CascadeType.ALL)
+    private Set<Report> reports = new HashSet<>();
+
+    public Set<Report> getReports() {
+        return reports;
+    }
+
+    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
+    private Set<Comment> comments = new HashSet<>();
+
+    public Set<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public void setReports(Set<Report> reports) {
+        this.reports = reports;
+    }
 
     public Set<Category> getListCategory() {
         return listCategory;

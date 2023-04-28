@@ -16,9 +16,11 @@
 <!-- nav bar  -->
 
 <div class="container" style="padding: 25px; background-color: #2A2A2A; margin-top: 40px;">
-    <p  style="text-transform: uppercase; font-weight: bold; font-size: 20px; padding-bottom: 20px; color: azure;"> Bài viết nổi bật </p>
+    <p th:if="${prominentPosts != null}" style="text-transform: uppercase; font-weight: bold; font-size: 20px; padding-bottom: 20px; color: azure;"> Bài viết nổi bật </p>
+    <p th:text="${category}" style="text-transform: uppercase; font-weight: bold; font-size: 20px; padding-bottom: 20px; color: azure;">  </p>
+
     <div class="owl-carousel owl-theme" >
-        <div class="item " th:each="post:${posts}">
+        <div class="item" th:each="post:${prominentPosts}">
             <a class="text-decoration-none"
                style="padding: 10px"
                th:href="@{./viewBlog?id={id}(id=${post.postId})}"
@@ -26,7 +28,7 @@
                th:title="${post.summary}"
             >
 
-                <img  th:src="@{${post.postImg}}" alt="image" />
+                <img class="img-fluid img-thumbnail"  th:src="@{${post.postImg}}" alt="image" style=" height: 100%;" />
                 <h4 class="text-center text-decoration-none"
                     style="padding: 10px;
                            color: #f0e3e3"
@@ -84,9 +86,8 @@
 
                     <img style="height: 100%;" class="img-fluid" th:src="@{${post.postImg}}" alt="">
                 </div>
-<!--            https://i.pinimg.com/originals/38/c2/f4/38c2f488315955c0bb8423f4d3367e71.jpg-->
+
                 <div class="col-md-9">
-<!--                    <p class="text-uppercase" style="color: rgba(233, 225, 225, 0.904);"> romance </p>-->
                     <div th:each="cate:${post.listCategory}" style="display: inline;">
                         <span style="color: rgba(232,221,221,0.68); font-size: 18px; margin-right: 8%" th:text="${cate.categoryName} "> </span>
 
@@ -95,7 +96,7 @@
                     <p class="text-light" th:text="${post.summary}"> The .NET Core SDK cannot be located: A valid dotnet installation could not be found. .NET Core debugging will not be enabled. Make sure the .NET Core SDK is installed and is on the path. </p>
                     <div class="row">
                         <div class="col-md-2">
-                            <img class="rounded-circle img-fluid" src="https://www.aussietreesolutions.com.au/wp-content/uploads/2018/08/facts-about-trees-1037x675.jpg" alt="">
+                            <img class="rounded-circle img-fluid" th:src="@{${post.user.userImg}}" alt="">
                         </div>
                         <div class="col-md-5">
                             <p class="text-light text-capitalize" style="margin-bottom: 0px" th:text="${post.user.userName}"> Nguyễn Minh Đức </p>
@@ -103,11 +104,11 @@
                         </div>
                         <div class="col-md-2">
 
-                            <p class="text-light text-end text-center" style="border-radius: 25px; background-color: rgba(15, 161, 161, 0.951);"> <span th:text="${post.upVote}"> 5 </span> Upvote</p>
+                            <p class="text-light text-end text-center" style="border-radius: 25px; background-color: rgba(15, 161, 161, 0.951);"> <span th:text="${post.upVote}">  </span> Upvote</p>
 
                         </div>
                         <div class="col-md-3">
-                            <p class="text-light text-end text-center" style="border-radius: 25px; background-color: rgb(234, 12, 12);"> <span> 3 </span> Comment</p>
+                            <p class="text-light text-end text-center" style="border-radius: 25px; background-color: rgb(234, 12, 12);"> <span th:text="${post.comments.size()}"> 3 </span> Comment</p>
                         </div>
                     </div>
                 </div>
@@ -118,9 +119,9 @@
 
                 <!--end item1  -->
 
-
-                <div class="col-md-12">
-                    <ul class="pagination justify-content-end" >
+<!--if home page-->
+                <div class="col-md-12" th:if="${category==null}">
+                    <ul class="pagination justify-content-end" th:if="${numPage>0}">
                         <li th:if="${currentPage!= 0}">
                             <a class="page-link" th:href="@{./home?pageNo={pageNo}(pageNo=${currentPage-1})}">Previous</a>
                         </li>
@@ -132,7 +133,22 @@
                         </li>
                     </ul>
                 </div>
-
+<!-- end if homepage   -->
+<!--if category -->
+            <div class="col-md-12" th:if="${category!=null}">
+                <ul class="pagination justify-content-end" th:if="${numPage>0}">
+                    <li th:if="${currentPage!= 0}">
+                        <a class="page-link" th:href="@{./searchByCategory(id=${categoryId}, pageNo = ${currentPage-1})}">Previous</a>
+                    </li>
+                    <li th:each="index : ${#numbers.sequence(0,numPage-1)}" th:class="${index == currentPage?'active':''}">
+                        <a class="page-link"  th:text="${index+1}"  th:href="@{./searchByCategory(id=${categoryId}, pageNo = ${index})}"></a>
+                    </li>
+                    <li th:if="${currentPage!= numPage-1}">
+                        <a class="page-link" th:href="@{./searchByCategory(id=${categoryId}, pageNo = ${currentPage+1})}">Next</a>
+                    </li>
+                </ul>
+            </div>
+<!--end if category-->
 
                 <div class="col-md-12" style="border-top: #f0e3e3 solid 1px;border-bottom: #f0e3e3 solid 1px;">
                     <div class="row">
@@ -169,18 +185,19 @@
                     <p class="text-transform text-light text-uppercase fs-4"  style="font-weight: bold;" > Các cây viết nổi bật </p>
                 </div>
                 <div class="row" th:each="user:${users}" style="margin-bottom:20px ">
-                <div class="col-md-3">
-                    <img class="rounded-circle img-fluid" src=" /img/alexia.jpg" alt="">
+                <div class="col-md-4">
+                    <img class="rounded-circle img-fluid"  th:src="@{${user.userImg == null?'/img/alexia.jpg':user.userImg}}" alt="">
                 </div>
 <!--                    https://www.aussietreesolutions.com.au/wp-content/uploads/2018/08/facts-about-trees-1037x675.jpg-->
-                <div class="col-md-5">
-                    <p class="text-light" style="font-weight: bold;margin-bottom: 5px" th:text="${user.userName}"> Nguyễn Minh Đức </p>
+                <div class="col-md-7">
+                    <a class="text-light text-decoration-none" style="font-weight: bold;margin-bottom: 5px" th:text="${user.userName}"
+                       th:href="@{./toAuthorBlog(authorId=${user.userId})}">
+                        Nguyễn Minh Đức
+                    </a>
                     <p style="color: rgb(198, 196, 196);" th:text="${user.userDescription}"> just some random guy on the internet </p>
                 </div>
 
-                <div class="col-md-4">
-                    <button class="btn btn-light btn-outline-dark w-100" style="border-radius: 25px;"> Follow  </button>
-                </div>
+
                 </div>
             </div>
 

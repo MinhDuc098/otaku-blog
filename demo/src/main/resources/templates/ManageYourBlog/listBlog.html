@@ -40,6 +40,15 @@
                 background-color: rgba(158, 7, 7, 0.795);
                 color: #f0e3e3;
         }
+
+        .pagination .active a{
+            background-color: rgba(158, 7, 7, 0.795);
+            color: #f0e3e3;
+        }
+        .dropdown-item:hover{
+            background-color: #111111;
+            text-align: center;
+        }
         /*.circular--landscape { */
         /*    display: inline-block; */
         /*    position: relative; */
@@ -66,33 +75,116 @@
         <div class="row">
             <div class="col-md-4" >
 
-                <div class="" >
+                <div class="">
                     <img        class="img-fluid img-thumbnail"
                                 th:src="@{${user.userImg}}"
-								 alt=""
-								 width="50%"
+                                alt=""
+                                width="50%"
 					/>
                 </div>
+
                 <p class="fs-4 text-light fw-bold" style="margin: 0px;" th:text="${user.userName}">
                     Tên Username 
                 </p>
-                <p style="color: rgba(240, 248, 255, 0.781);" th:text="${user.userEmail}">
+
+                <p th:if="${session.userID == user.userId}" style="color: rgba(240, 248, 255, 0.781);" th:text="${user.userEmail}">
                     Email User 
                 </p>
-                <a th:href="@{./toYourAccount?id={id}(id=${session.userID})}">
-                <button class="btn btn-dark text-light" style="border: #2A2A2A solid 1px;"> 
+
+                <a th:if="${session.userID == user.userId}" th:href="@{./toYourAccount?id={id}(id=${session.userID})}">
+                <button  class="btn btn-dark text-light" style="border: #2A2A2A solid 1px;">
                     Chỉnh sửa trang cá nhân 
                 </button>
                 </a>
+
+                <div class="row" style="width: 70%">
+                    <div class="col-md-6 text-light" onclick="showFollower()">
+                        <div th:text="${numFollower}"> Số follower </div>
+                        <div> follower </div>
+                    </div>
+
+                    <div class="col-md-6 text-light" onclick="showUserYouFollowing()">
+                        <div th:text="${numUserYouFollowing}"> Số following </div>
+                        <div> following </div>
+                    </div>
+                </div>
+
+                <div class="text-light" id="follower" style="margin-top: 40px;display: none">
+                    <div style="font-weight: bold; margin-bottom: 20px"> Follower:</div>
+
+                    <div class="row" th:each="userFollowed:${Followers}" style="margin-bottom: 30px">
+
+                        <div class="col-md-4">
+                            <img class="rounded-circle img-fluid"style="width: 50%" th:src="@{${userFollowed.userImg}}" alt="">
+                        </div>
+
+                        <div class="col-md-7">
+                            <a class="text-light text-decoration-none" style="font-weight: bold;margin-bottom: 5px" th:text="${userFollowed.userName}"
+                               th:href="@{./toAuthorBlog(authorId=${userFollowed.userId})}">
+                            </a>
+                            <p style="color: rgb(198, 196, 196);" th:text="${userFollowed.userDescription}"> just some random guy on the internet </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="text-light" id="following" style="margin-top: 40px;display: none">
+                    <div style="font-weight: bold; margin-bottom: 20px"> You're following:</div>
+
+                    <div class="row" th:each="userFollowed:${userFolloweds}" style="margin-bottom: 30px">
+
+                        <div class="col-md-4">
+                            <img class="rounded-circle img-fluid"style="width: 50%" th:src="@{${userFollowed.userImg}}" alt="">
+                        </div>
+
+                        <div class="col-md-7">
+                            <a class="text-light text-decoration-none" style="font-weight: bold;margin-bottom: 5px" th:text="${userFollowed.userName}"
+                               th:href="@{./toAuthorBlog(authorId=${userFollowed.userId})}">
+                            </a>
+                            <p style="color: rgb(198, 196, 196);" th:text="${userFollowed.userDescription}"> just some random guy on the internet </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
             </div>
             <div class="col-md-8">
                <h3 style="color: #f0e3e3;margin-bottom:40px;"> Bài viết </h3>
                <div class="row" >
 
-                    <a class="col-md-4 text-decoration-none" style="margin-bottom:40px;" th:each="post:${userPost}" th:href="@{./viewBlog?id={id}(id=${post.postId})}" >
+                    <div class="col-md-4 text-decoration-none" style="margin-bottom:40px;" th:each="post:${userPost}" >
+
                         <img class="img-fluid" th:src="@{${post.postImg}}" alt="">
+
+                        <a th:href="@{./viewBlog?id={id}(id=${post.postId})}" class="text-decoration-none">
                         <p style="margin-top: 10px; color: #f0e3e3; font-size: 20px" class=" fw-bold" th:text="${post.postTitle}"> Title Bài Viết </p>
-                    </a>
+                        </a>
+
+                        <a th:if="${session.userID == user.userId}" th:href="@{./deleteYourPost?id={id}(id=${post.postId})}" onclick="return confirmRemove(event)" style="text-decoration: none; color: #f0e3e3">
+                        <button  class="btn btn-sm btn-danger" >
+
+                            <i class="fas fa-trash-alt"></i> Xoá
+
+                        </button>
+                        </a>
+                    </div>
+
+                    <div class="col-md-12" th:if="${numPage>0}">
+                       <ul class="pagination justify-content-end" >
+                           <li th:if="${currentPage!= 0}">
+                               <a class="page-link" th:href="@{./toYourBlog?pageNo={pageNo}(pageNo=${currentPage-1})}">Previous</a>
+                           </li>
+                           <li th:each="index : ${#numbers.sequence(0,numPage-1)}" th:class="${index == currentPage?'active':''}">
+                               <a class="page-link"  th:text="${index+1}"  th:href="@{./toYourBlog?pageNo={pageNo}(pageNo=${index})}"></a>
+                           </li>
+                           <li th:if="${currentPage!= numPage-1}">
+                               <a class="page-link" th:href="@{./toYourBlog?pageNo={pageNo}(pageNo=${currentPage+1})}">Next</a>
+                           </li>
+                       </ul>
+                    </div>
 
 
                </div>
@@ -143,6 +235,41 @@
       return new bootstrap.Tooltip(tooltipTriggerEl);
   });
   </script>
+
+    <script th:inline="javascript">
+    function confirmRemove(event){
+        if(!confirm("Bạn có chắc muốn xóa bài viết này không")){
+            event.preventDefault();
+            return false
+        }
+         return true;
+    }
+    </script>
+
+    <script>
+        function showFollower(){
+            // if(document.getElementById("follower").style.display == "none"){
+                document.getElementById("follower").style.display = "block"
+            // }
+            // if(document.getElementById("follower").style.display == "block"){
+            //     document.getElementById("follower").style.display = "none"
+            // }
+            document.getElementById("following").style.display = "none";
+
+        }
+
+        function showUserYouFollowing(){
+            // if(document.getElementById("following").style.display == "none"){
+                document.getElementById("following").style.display = "block"
+            // }
+            // if(document.getElementById("following").style.display == "block"){
+            //     document.getElementById("following").style.display = "none"
+            // }
+            document.getElementById("follower").style.display = "none";
+
+
+        }
+    </script>
 </body>
 
 </html>

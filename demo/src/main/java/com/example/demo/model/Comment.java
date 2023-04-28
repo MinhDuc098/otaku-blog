@@ -1,12 +1,15 @@
 package com.example.demo.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "comment")
 public class Comment {
     @Id
     @Column(name = "comment_id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer commentId;
 
     @Column(name = "comment_content")
@@ -15,14 +18,38 @@ public class Comment {
     @Column(name = "comment_parrent")
     private Integer commentParrent;
 
-    @Column(name = "user_id")
-    private Integer userId;
+//    @Column(name = "user_id")
+//    private Integer userId;
 
-    @Column(name = "post_id")
-    private Integer postId;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+//    @Column(name = "post_id")
+//    private Integer postId;
+
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
+
+    public Post getPost() {
+        return post;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
+    }
 
     @Column(name = "created_at")
-    private java.sql.Timestamp createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private java.sql.Timestamp updatedAt;
@@ -51,27 +78,14 @@ public class Comment {
         this.commentParrent = commentParrent;
     }
 
-    public Integer getUserId() {
-        return this.userId;
-    }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
 
-    public Integer getPostId() {
-        return this.postId;
-    }
 
-    public void setPostId(Integer postId) {
-        this.postId = postId;
-    }
-
-    public java.sql.Timestamp getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return this.createdAt;
     }
 
-    public void setCreatedAt(java.sql.Timestamp createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 

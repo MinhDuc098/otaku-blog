@@ -1,26 +1,29 @@
 package com.example.demo.service;
 
-import com.example.demo.model.Category;
-import com.example.demo.model.Post;
-import com.example.demo.model.User;
-import com.example.demo.repositories.CategoryRepository;
-import com.example.demo.repositories.PostRepository;
+import com.example.demo.model.*;
+import com.example.demo.repositories.*;
 
-import com.example.demo.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
@@ -33,25 +36,67 @@ public class BlogService {
     private UserRepository userRepository;
     @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private VoteRepository voteRepository;
 
-    public String viewPost(int id, Model model){
+    @Autowired
+    private FollowRepository  followRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
+    private ReportRepository reportRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
+
+    public String viewPost(int id,Model model,HttpSession session){
         List<Category> listCategory = homeService.getListCategory();
         Post post = postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Post not found"));
-
+//        get all comment and sort by date
+        List<Comment> commentList = commentRepository.getCommentByPostId(id);
+//      get author of blog
         User user = userRepository.findById(post.getUser().getUserId()).orElseThrow(() -> new EntityNotFoundException("user not found"));
+        Comment comment = new Comment();
+//        if user logined
+        if(session.getAttribute("userID")!=null){
+//            get user id
+            int viewerid = (int) session.getAttribute("userID");
+//            get upvote, downvote status see if user have up/down this blog or not
+            Vote v = voteRepository.getVoteByUserPost(viewerid,id);
+            if(v!=null) {
+                model.addAttribute("voteStatus",v.getUpvote());
+            }
+//      set post id for comment to see which post is comment in
 
+            comment.setPost(post);
+//      add notification
+            User u = userRepository.findById(viewerid).orElseThrow();
+            model.addAttribute("userNotify",u.getUserNotification());
+
+        }
+
+
+//      get vote = upvote - downvote
         int vote = post.getUpVote() - post.getDownVote();
-
+//        if content of post contain html, set to content Html
         if(containsHtmlTags(post.getPostContent())){
             model.addAttribute("contentHtml", post.getPostContent());
         }
+        //        if content of post not contain html, set to content text
         if(!containsHtmlTags(post.getPostContent())){
             model.addAttribute("contentText",post.getPostContent());
         }
+//        sent comment list to template
+        model.addAttribute("commentList",commentList);
+//        sent comment object to add new comment
+        model.addAttribute("comment", comment);
         model.addAttribute("listCategory",listCategory);
         model.addAttribute("post",post);
         model.addAttribute("user",user);
         model.addAttribute("vote",vote);
+
         return "ReadBlog/readBlog";
     }
 
@@ -61,11 +106,53 @@ public class BlogService {
     }
 
 
-    public String upvote(int id, RedirectAttributes attributes,HttpSession session){
+    public String upvote(int id,  RedirectAttributes attributes, HttpSession session,Model model){
         if(session.getAttribute("userID")!=null) {
             Post post = postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Post not found"));
-            post.setUpVote(post.getUpVote() + 1);
-            postRepository.save(post);
+            int userId = (int)session.getAttribute("userID");
+            Vote vote = voteRepository.getVoteByUserPost(userId,id);
+            User user = userRepository.findById(userId).orElseThrow();
+            String message = "người dùng "+ user.getUserName()+ " đã upvote bài viết "+ post.getPostTitle()+" của bạn";
+//          day vote created
+            LocalDateTime now = LocalDateTime.now();
+            Notification notification = new Notification();
+//            set notify for user
+            notification.setCreatedAt(now);
+            notification.setNotificationContent(message);
+            notification.setUserReceiverNotification(post.getUser());
+            notification.setNotificationLink("./viewBlog(id ="+ id+")");
+
+            notificationRepository.save(notification);
+            if(vote==null){
+                post.setUpVote(post.getUpVote() + 1);
+                Vote v = new Vote();
+                v.setPostId(id);
+                v.setUserId(userId);
+                v.setUpvote("up");
+                postRepository.save(post);
+                voteRepository.save(v);
+
+            }
+            else{
+                if(vote.getUpvote().equals("up") ){
+                    post.setUpVote(post.getUpVote() - 1);
+                    voteRepository.delete(vote);
+                    postRepository.save(post);
+                    notificationRepository.delete(notification);
+                }
+                if(vote.getUpvote().equals("down")){
+                    post.setUpVote(post.getUpVote() + 1);
+                    post.setDownVote(post.getDownVote()-1);
+                    vote.setUpvote("up");
+
+                    voteRepository.save(vote);
+                    postRepository.save(post);
+
+                }
+            }
+
+
+
             attributes.addAttribute("id", id);
             return "redirect:./viewBlog";
         }
@@ -74,11 +161,54 @@ public class BlogService {
     }
 
 
-    public String downvote(int id, RedirectAttributes attributes,HttpSession session){
+    public String downvote(int id, RedirectAttributes attributes,HttpSession session, Model model){
         if(session.getAttribute("userID")!=null) {
             Post post = postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Post not found"));
-            post.setDownVote(post.getDownVote() + 1);
-            postRepository.save(post);
+            int userId = (int)session.getAttribute("userID");
+            Vote vote = voteRepository.getVoteByUserPost(userId,id);
+
+            User user = userRepository.findById(userId).orElseThrow();
+            String message = "người dùng "+ user.getUserName()+ " đã downvote bài viết "+ post.getPostTitle()+" của bạn";
+            LocalDateTime now = LocalDateTime.now();
+            Notification notification = new Notification();
+//            set notify for user
+            notification.setCreatedAt(now);
+            notification.setNotificationContent(message);
+            notification.setUserReceiverNotification(post.getUser());
+            notification.setNotificationLink("./viewBlog(id ="+ id+")");
+
+            notificationRepository.save(notification);
+
+            if(vote==null){
+                post.setDownVote(post.getDownVote() + 1);
+                Vote v = new Vote();
+                v.setPostId(id);
+                v.setUserId(userId);
+                v.setUpvote("down");
+                postRepository.save(post);
+                voteRepository.save(v);
+
+            }
+            else{
+                if(vote.getUpvote().equals("down") ){
+                    post.setDownVote(post.getDownVote() - 1);
+                    voteRepository.delete(vote);
+                    postRepository.save(post);
+                    notificationRepository.delete(notification);
+                }
+                if(vote.getUpvote().equals("up")){
+                    post.setUpVote(post.getUpVote() - 1);
+                    post.setDownVote(post.getDownVote()+1);
+                    vote.setUpvote("down");
+
+                    voteRepository.save(vote);
+                    postRepository.save(post);
+
+                }
+            }
+
+
+
             attributes.addAttribute("id", id);
             return "redirect:./viewBlog";
         }
@@ -90,8 +220,10 @@ public class BlogService {
 
         if(session.getAttribute("userID")!=null){
             Post p = new Post();
-//            int userid = (int)session.getAttribute("userID");
-//            User user = userRepository.findById(userid).orElseThrow(()-> new EntityNotFoundException(""));
+
+            int userid = (int)session.getAttribute("userID");
+            User user = userRepository.findById(userid).orElseThrow();
+            model.addAttribute("userNotify", user.getUserNotification());
 //
 //            p.setUser(user);
             p.setDownVote(0);
@@ -105,6 +237,18 @@ public class BlogService {
         session.setAttribute("message","you have to login to use that function");
         return "redirect:./tologin";
 
+    }
+    public String getImgFromContent(String content){
+        String regex =  "<img.*?src=\"(.*?)\"";
+
+        Pattern pattern = Pattern.compile(regex);
+
+        Matcher matcher = pattern.matcher(content);
+
+        if(matcher.find()){
+            return matcher.group(1);
+        }
+        return null;
     }
 
     public String addNewBlog(Post post,RedirectAttributes attributes,Set<Integer> categories,HttpSession session) {
@@ -126,12 +270,11 @@ public class BlogService {
         p.setPostContent(post.getPostContent());
         p.setSummary(post.getSummary());
         p.setListCategory(lc);
-        if(post.getPostImg() == null){
+        p.setPostImg(getImgFromContent(post.getPostContent()));
+        if(p.getPostImg() == null){
             p.setPostImg("/img/tohsaka.jpg");
         }
-        else{
-            p.setPostImg(post.getPostImg());
-        }
+
 
 
         postRepository.save(p);
@@ -139,16 +282,42 @@ public class BlogService {
         return "redirect:/home";
     }
 
-    public String toYourBlog(Model model, HttpSession session) {
+    public String toYourBlog(Model model, HttpSession session,int pageNo,int pageSize) {
         if(session.getAttribute("userID") != null){
 
             List<Category> listCategory = categoryRepository.findAll();
             User user = userRepository.findById((int)session.getAttribute("userID")).orElseThrow(()-> new EntityNotFoundException("not found user"));
-            Set<Post> userPost = user.getPost();
 
+            Pageable pageable = PageRequest.of(pageNo, pageSize);
+            Page<Post> userPost = postRepository.getAllPostByUser((int)session.getAttribute("userID"),pageable);
+
+            List<Integer> numFollower = followRepository.getFollowerId(user.getUserId());
+            List<Integer> numUserYouFollowing = followRepository.getUserFollowed(user.getUserId());
+
+            List<User> Followers = new ArrayList<>();
+            List<User> userFolloweds = new ArrayList<>();
+
+            for(int i = 0;i<numFollower.size();i++){
+                User u = userRepository.findById(numFollower.get(i)).orElseThrow();
+                Followers.add(u);
+            }
+
+
+            for(int i = 0;i<numUserYouFollowing.size();i++){
+                User u = userRepository.findById(numUserYouFollowing.get(i)).orElseThrow();
+                userFolloweds.add(u);
+            }
+
+            model.addAttribute("userNotify", user.getUserNotification());
+            model.addAttribute("Followers",Followers);
+            model.addAttribute("userFolloweds",userFolloweds);
+            model.addAttribute("numFollower",numFollower.size());
+            model.addAttribute("numUserYouFollowing",numUserYouFollowing.size());
+            model.addAttribute("numPage",userPost.getTotalPages());
+            model.addAttribute("currentPage", pageNo);
             model.addAttribute("user",user);
-;            model.addAttribute("listCategory",listCategory);
-            model.addAttribute("userPost",userPost);
+            model.addAttribute("listCategory",listCategory);
+            model.addAttribute("userPost",userPost.getContent());
         }
         else {
             session.setAttribute("message","You have to login to do first");
@@ -156,5 +325,82 @@ public class BlogService {
         }
 
         return "ManageYourBlog/listBlog";
+    }
+
+    public String deleteYourPost(int id,HttpSession session) {
+        if(session.getAttribute("userID")!= null){
+            Post post = postRepository.findById(id).orElseThrow();
+            if((int)session.getAttribute("userID") == post.getUser().getUserId()){
+                postRepository.deleteById(id);
+            }
+        }
+        else{
+            session.setAttribute("message","You have to login to do first");
+            return "Login/login";
+        }
+
+
+      return "redirect:./toYourBlog";
+    }
+
+    public String toAuthorBlog(int authorId, Model model, int pageNo, int pageSize, HttpSession session) {
+        if(session.getAttribute("userID") != null){
+            Follow follow = followRepository.getFollow(authorId, (int)session.getAttribute("userID"));
+            if(follow == null){
+                model.addAttribute("followStatus","");
+            }
+            else{
+                model.addAttribute("followStatus","followed");
+            }
+            User u = userRepository.findById((int)session.getAttribute("userID")).orElseThrow();
+            model.addAttribute("userNotify", u.getUserNotification());
+        }
+
+
+        List<Category> listCategory = categoryRepository.findAll();
+        User user = userRepository.findById(authorId).orElseThrow(()-> new EntityNotFoundException("not found user"));
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Page<Post> authorPost = postRepository.getAllPostByUser(authorId,pageable);
+
+
+        model.addAttribute("numPage",authorPost.getTotalPages());
+        model.addAttribute("currentPage", pageNo);
+        model.addAttribute("user",user);
+        model.addAttribute("listCategory",listCategory);
+        model.addAttribute("authorPost",authorPost.getContent());
+        return "AuthorBlog/authorBlog";
+    }
+
+
+
+    public String ReportPost(int id,String reason, HttpSession session,Model model,RedirectAttributes attributes) {
+        if(session.getAttribute("userID") != null){
+
+            User user = userRepository.findById((int) session.getAttribute("userID")).orElseThrow();
+            Post post = postRepository.findById(id).orElseThrow();
+//            get time now
+            LocalDateTime now = LocalDateTime.now();
+            Report report = new Report();
+
+            report.setCreatedAt(now);
+            report.setPost(post);
+            report.setUser(user);
+            report.setReportReason(reason);
+            model.addAttribute("report",report);
+
+            reportRepository.save(report);
+
+//            add notification for admins
+            List<User> listAdmin = userRepository.getAllAdmin();
+            for (User admin: listAdmin) {
+                admin.setUserNotification(admin.getUserNotification()+1);
+            }
+
+            attributes.addAttribute("id",id);
+            return "redirect:./viewBlog";
+        }
+        session.setAttribute("message","You have to login to do it");
+        return "Login/login";
     }
 }

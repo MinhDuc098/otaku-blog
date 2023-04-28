@@ -26,6 +26,7 @@ public class LoginService {
                session.setAttribute("userName", u.getUserName());
                session.setAttribute("userPass", u.getUserPassword());
                session.setAttribute("userImg", u.getUserImg());
+               session.setAttribute("userAuthor",u.getUserAuthor());
                return "redirect:./home";
            }
            else {
