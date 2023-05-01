@@ -64,6 +64,10 @@ public class Post {
         return reports;
     }
 
+
+    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
+    private Set<Savepost> saveposts = new HashSet<>();
+
     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
     private Set<Comment> comments = new HashSet<>();
 
@@ -173,5 +177,13 @@ public class Post {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Set<Savepost> getSaveposts() {
+        return saveposts;
+    }
+
+    public void setSaveposts(Set<Savepost> saveposts) {
+        this.saveposts = saveposts;
     }
 }

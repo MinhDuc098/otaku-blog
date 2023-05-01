@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="fragments/header.html :: head">
+
+</head>
+<body style="background-color: #111111;">
+<div th:insert="fragments/header.html :: navigationBar"></div>
+
+<div class="container" style="background-color: #2A2A2A; margin-top: 50px;">
+    <h1 class="text-light text-center" style="margin-bottom: 26px">Thông Báo</h1>
+    <div class="col-md-6" style=" padding: 20px;">
+
+        <div class="row" style="margin-bottom: 20px" th:each="notify:${notifies}">
+
+            <div class="col-md-2" >
+                <img  style="border-radius: 50px; height: 65px; width: 65px"  th:src="${notify.userRelate.userImg}" alt="">
+            </div>
+
+            <div class="col-md-8">
+
+                <a th:href="${notify.notificationLink}" class="text-decoration-none">
+
+
+                    <div>
+                    <p th:text="${notify.notificationContent}" class="text-light"> </p>
+                    <p style="font-size: 15px; color: rgba(192, 187, 187, 0.899)" th:text="${notify.createdAt}">  </p>
+                    </div>
+                </a>
+
+            </div>
+
+            <div class="col-md-2">
+                <a th:href="@{./deleteUserNotify(notifyId = ${notify.notificationId})}">
+                    <button class="btn btn-success">
+                        Delete
+                    </button>
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

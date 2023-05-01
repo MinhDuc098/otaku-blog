@@ -69,6 +69,12 @@ public class User {
     @OneToMany(mappedBy = "userReceiverNotification")
     private List<Notification> notifications;
 
+    @OneToMany(mappedBy = "user")
+    private List<Savepost> saveposts;
+
+    @OneToMany(mappedBy = "userRelate")
+    private List<Notification> notificationList;
+
 
     public Set<Report> getReports() {
         return reports;
@@ -196,5 +202,22 @@ public class User {
 
     public void setNotifications(List<Notification> notifications) {
         this.notifications = notifications;
+    }
+
+
+    public List<Savepost> getSaveposts() {
+        return saveposts;
+    }
+
+    public void setSaveposts(List<Savepost> saveposts) {
+        this.saveposts = saveposts;
+    }
+
+    public List<Notification> getNotificationList() {
+        return notificationList;
+    }
+
+    public void setNotificationList(List<Notification> notificationList) {
+        this.notificationList = notificationList;
     }
 }

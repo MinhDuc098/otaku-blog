@@ -26,6 +26,9 @@ public class Notification {
     @Column(name = "notification_link")
     private String notificationLink;
 
+    @ManyToOne
+    @JoinColumn(name = "user_relate")
+    private User userRelate;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -68,5 +71,14 @@ public class Notification {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+
+    public User getUserRelate() {
+        return userRelate;
+    }
+
+    public void setUserRelate(User userRelate) {
+        this.userRelate = userRelate;
     }
 }

@@ -3,15 +3,18 @@ package com.example.demo.controllers;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.example.demo.model.Category;
+import com.example.demo.model.Notification;
 import com.example.demo.model.ReportUser;
 import com.example.demo.model.User;
 import com.example.demo.repositories.CategoryRepository;
+import com.example.demo.repositories.NotificationRepository;
 import com.example.demo.repositories.ReportUserRepository;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.service.HomeService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping(path = "/")
@@ -40,6 +41,11 @@ public class AccountController {
     @Autowired
     private ReportUserRepository reportUserRepository;
 
+    @Autowired
+    private NotificationRepository notificationRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @GetMapping(path = "/toYourAccount")
     public String toAccount(HttpSession session,@RequestParam int id, Model model){
@@ -119,6 +125,36 @@ public class AccountController {
         }
         session.setAttribute("message","you have to login to use that function");
         return "redirect:./tologin";
+    }
+
+    @GetMapping(path = "/toUserNotify")
+    public String toUserNotify(HttpSession session, Model model){
+
+        if(session.getAttribute("userID")!=null) {
+
+
+            User user = userRepository.findById((int) session.getAttribute("userID")).orElseThrow();
+            List<Notification> notifications = user.getNotifications();
+            Collections.sort(notifications, Comparator.comparing(Notification::getCreatedAt).reversed());
+
+
+            List<Category> listCategory = categoryRepository.findAll();
+            user.setUserNotification(0);
+
+            model.addAttribute("userNotify",user.getUserNotification());
+            model.addAttribute("notifies", notifications);
+            model.addAttribute("listCategory",listCategory);
+            return "Account/userNotification";
+        }
+        session.setAttribute("message","you have to login to do it");
+        return "redirect:./tologin";
+    }
+
+    @GetMapping(path = "/deleteUserNotify")
+    public String deleteUserNotify(int notifyId){
+        Notification notification = notificationRepository.findById(notifyId).orElseThrow();
+        notificationRepository.delete(notification);
+        return "redirect:./toUserNotify";
     }
 
 

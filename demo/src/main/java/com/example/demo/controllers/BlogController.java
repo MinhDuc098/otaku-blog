@@ -67,6 +67,21 @@ public class BlogController {
         return viewBlogService.ReportPost(id,reason,session,model,attributes);
     }
 
+    @GetMapping(path = "/savePost")
+    public String savePost(int postId, HttpSession session, RedirectAttributes attributes){
+        return viewBlogService.savePost(postId,session,attributes);
+    }
+
+
+    @GetMapping(path = "/toSavedPost")
+    public String toSavedPost(HttpSession session, Model model ,  @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize){
+        return viewBlogService.toSavedPost(session, model,pageNo,pageSize);
+    }
+
+    @GetMapping(path = "/removeSavedPost")
+    public String removeSavedPost(int id, HttpSession session, RedirectAttributes attributes){
+        return viewBlogService.removeSavedPost(id,session, attributes);
+    }
 
 }
 

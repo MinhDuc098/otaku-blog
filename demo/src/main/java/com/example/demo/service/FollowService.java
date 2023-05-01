@@ -48,8 +48,10 @@ public class FollowService {
                 notification.setCreatedAt(now);
                 notification.setUserReceiverNotification(userFollowed);
                 notification.setNotificationContent(message);
+                notification.setUserRelate(userFollowing);
 
                 notificationRepository.save(notification);
+                userFollowed.setUserNotification(userFollowed.getUserNotification()+1);
 
             }
             else{

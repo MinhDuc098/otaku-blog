@@ -51,6 +51,9 @@ public class BlogService {
     @Autowired
     private NotificationRepository notificationRepository;
 
+    @Autowired
+    private SavePostRepository savePostRepository;
+
     public String viewPost(int id,Model model,HttpSession session){
         List<Category> listCategory = homeService.getListCategory();
         Post post = postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Post not found"));
@@ -120,7 +123,8 @@ public class BlogService {
             notification.setCreatedAt(now);
             notification.setNotificationContent(message);
             notification.setUserReceiverNotification(post.getUser());
-            notification.setNotificationLink("./viewBlog(id ="+ id+")");
+            notification.setNotificationLink("./viewBlog?id="+id);
+            notification.setUserRelate(user);
 
             notificationRepository.save(notification);
             if(vote==null){
@@ -131,7 +135,7 @@ public class BlogService {
                 v.setUpvote("up");
                 postRepository.save(post);
                 voteRepository.save(v);
-
+                post.getUser().setUserNotification(post.getUser().getUserNotification()+1);
             }
             else{
                 if(vote.getUpvote().equals("up") ){
@@ -147,7 +151,7 @@ public class BlogService {
 
                     voteRepository.save(vote);
                     postRepository.save(post);
-
+                    post.getUser().setUserNotification(post.getUser().getUserNotification()+1);
                 }
             }
 
@@ -175,7 +179,8 @@ public class BlogService {
             notification.setCreatedAt(now);
             notification.setNotificationContent(message);
             notification.setUserReceiverNotification(post.getUser());
-            notification.setNotificationLink("./viewBlog(id ="+ id+")");
+            notification.setNotificationLink("./viewBlog?id="+id);
+            notification.setUserRelate(user);
 
             notificationRepository.save(notification);
 
@@ -187,7 +192,7 @@ public class BlogService {
                 v.setUpvote("down");
                 postRepository.save(post);
                 voteRepository.save(v);
-
+                post.getUser().setUserNotification(post.getUser().getUserNotification()+1);
             }
             else{
                 if(vote.getUpvote().equals("down") ){
@@ -203,7 +208,7 @@ public class BlogService {
 
                     voteRepository.save(vote);
                     postRepository.save(post);
-
+                    post.getUser().setUserNotification(post.getUser().getUserNotification()+1);
                 }
             }
 
@@ -399,6 +404,71 @@ public class BlogService {
 
             attributes.addAttribute("id",id);
             return "redirect:./viewBlog";
+        }
+        session.setAttribute("message","You have to login to do it");
+        return "Login/login";
+    }
+
+    public String savePost(int postId, HttpSession session, RedirectAttributes attributes) {
+        if(session.getAttribute("userID") != null){
+//            get the post by postId
+            Post post = postRepository.findById(postId).orElseThrow();
+//            get time now
+            LocalDateTime now = LocalDateTime.now();
+//            get user who want to save post
+            User user = userRepository.findById((int) session.getAttribute("userID")).orElseThrow();
+//            check if this user have already save this post before or not
+            Savepost savepost = savePostRepository.getSavepostByUserIdAndPostId(user.getUserId(),postId);
+//            user saved this post once time before
+            if(savepost != null){
+                savepost.setCreatedAt(now);
+                savePostRepository.save(savepost);
+            }
+//            this is the first time this user save this post
+            else{
+                Savepost s = new Savepost();
+                s.setCreatedAt(now);
+                s.setUser(user);
+                s.setPost(post);
+                savePostRepository.save(s);
+            }
+
+            attributes.addAttribute("id",postId);
+            return "redirect:./viewBlog";
+        }
+        session.setAttribute("message","You have to login to do it");
+        return "Login/login";
+
+    }
+
+    public String toSavedPost(HttpSession session, Model model,int pageNo, int pageSize) {
+        if(session.getAttribute("userID") != null){
+            Pageable pageable = PageRequest.of(pageNo, pageSize);
+            User u = userRepository.findById((int)session.getAttribute("userID")).orElseThrow();
+
+
+            Page<Savepost> saveposts = savePostRepository.getSavedPost((int) session.getAttribute("userID"),pageable);
+            List<Category> listCategory = categoryRepository.findAll();
+
+
+
+            model.addAttribute("userNotify", u.getUserNotification());
+            model.addAttribute("numPage",saveposts.getTotalPages());
+            model.addAttribute("currentPage", pageNo);
+            model.addAttribute("listCategory",listCategory);
+            model.addAttribute("savedPosts",saveposts.getContent());
+
+            return "ManageYourBlog/savePost";
+        }
+        session.setAttribute("message","You have to login to do it");
+        return "Login/login";
+    }
+
+    public String removeSavedPost(int id, HttpSession session, RedirectAttributes attributes) {
+        if(session.getAttribute("userID")!= null){
+            Savepost savepost = savePostRepository.findById(id).orElseThrow();
+            savePostRepository.delete(savepost);
+            return "redirect:./toSavedPost";
         }
         session.setAttribute("message","You have to login to do it");
         return "Login/login";

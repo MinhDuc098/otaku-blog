@@ -219,4 +219,29 @@ public class AdminService {
             }
         }
     }
+
+    public String upAuthor(int userId, HttpSession session) {
+        if(session.getAttribute("userAuthor") == null){
+            session.setAttribute("message","you have to login to use that function");
+            return "redirect:../tologin";
+        }
+        else {
+            if((int)session.getAttribute("userAuthor") == 5){
+                User user = userRepository.findById(userId).orElseThrow();
+                if(user.getUserAuthor() <5){
+                    user.setUserAuthor(user.getUserAuthor()+1);
+                }
+                else if(user.getUserAuthor() == 5){
+                    user.setUserAuthor(user.getUserAuthor()-4);
+                }
+
+
+                return "redirect:./manageUserAccount";
+            }
+            else{
+                session.setAttribute("message","you doesn't have author to do it");
+                return "redirect:../tologin";
+            }
+        }
+    }
 }

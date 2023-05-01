@@ -60,6 +60,7 @@
           <th>Describe </th>
           <th>Date Of Birth</th>
           <th>Email</th>
+          <th> Author Level </th>
           <th>Role</th>
           <th>Status</th>
           <th>Action</th>
@@ -72,19 +73,20 @@
             <td th:text="${user.userDescription}">  </td>
             <td th:text="${user.userDateOfBirth}"> </td>
             <td th:text="${user.userEmail}">  </td>
-            <td th:text="${user.userAuthor==5?'Admin':'User'}"> </td>
+            <td th:text="${user.userAuthor}" ></td>
+            <td th:text="${user.userAuthor==5?'Admin':'User level '+user.userAuthor}"> </td>
             <td th:text="${user.userBanned==0?'Active':'Banned'}"><span class="status text-danger">&bull;</span> Active</td>
 
             <td>
-              <a th:href="@{./banOrRemoveBan(id = ${user.userId})}" class="delete" title="Ban" data-toggle="tooltip">
+              <a th:if="${session.userID != user.userId}" th:href="@{./banOrRemoveBan(id = ${user.userId})}" class="delete" title="Ban" data-toggle="tooltip">
                 <button class="btn btn-danger" th:text="${user.userBanned==0?'Ban':'Remove Ban'}"> </button>
               </a>
             </td>
 
             <td>
-              <a href="">
+              <a th:if="${session.userID != user.userId}" th:href="@{./upAuthor(userId = ${user.userId})}">
                 <button class="btn btn-dark" style="font-size: 16px" onclick="showFormReport()">
-                  authority
+                  Up Author
                 </button>
               </a>
             </td>

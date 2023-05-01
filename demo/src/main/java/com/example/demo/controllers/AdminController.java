@@ -61,4 +61,9 @@ public class AdminController {
     public String sendNotification(String notficationContent, int receiverId, HttpSession session){
         return adminService.sendNotification(notficationContent,receiverId, session);
     }
+
+    @GetMapping(path = "/upAuthor")
+    public String upAuthor(int userId, HttpSession session){
+        return adminService.upAuthor(userId,session);
+    }
 }

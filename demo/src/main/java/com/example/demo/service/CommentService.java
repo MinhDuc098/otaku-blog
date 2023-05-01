@@ -47,12 +47,14 @@ public class CommentService {
             String message = "người dùng "+ authorComment.getUserName()+ " đã bình luận vào bài viết "+ post.getPostTitle()  +" của bạn";
             Notification notification = new Notification();
 
-            notification.setNotificationLink("./viewBlog(id ="+ id +")");
+            notification.setNotificationLink("./viewBlog?id="+id);
             notification.setCreatedAt(now);
             notification.setUserReceiverNotification(post.getUser());
             notification.setNotificationContent(message);
+            notification.setUserRelate(authorComment);
 //          lưu vào datbase
             notificationRepository.save(notification);
+            post.getUser().setUserNotification(post.getUser().getUserNotification()+1);
 
             attributes.addAttribute("id",id);
             return "redirect:./viewBlog";

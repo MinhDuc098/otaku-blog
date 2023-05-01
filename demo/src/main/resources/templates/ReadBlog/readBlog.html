@@ -12,6 +12,15 @@
     <div class="container" style="background-color: #2A2A2A; margin-top: 100px;">
         <div style="width: 50%;margin-left: auto; margin-right: auto; padding-top: 50px; padding-bottom: 60px;" >
 <!--                <img th:src="@{${post.postImg}}" alt="">-->
+
+                <div style="margin-bottom: 30px">
+                    <a th:href="@{./savePost(postId = ${post.postId})}">
+                    <button class="btn btn-success btn-outline-dark" style="color: rgb(232, 221, 221);" onclick="saveSuccessfull()">
+                        <i class="fas fa-chess"></i>
+                        Lưu Bài Viết
+                    </button>
+                    </a>
+                </div>
                 <div th:each="cate:${post.listCategory}" style="display: inline;">
                 <span style="color: rgba(232,221,221,0.68); font-size: 18px; margin-right: 8%" th:text="${cate.categoryName} "> </span>
 
@@ -43,7 +52,8 @@
                                 <span class="d-flex justify-content-end" style="margin-right: 12px;" th:text="${vote}">
 
                                 </span>
-                                <a th:if="${voteStatus == null}" th:href="@{./downvote(id=${post.postId})}" data-bs-toggle="tooltip" data-bs-placement="top" title="downvote" style="margin: 5px; color: #eae7e748;" >
+                                <a th:if="${voteStatus == null}" th:href="@{./downvote(id=${post.postId})}" data-bs-toggle="tooltip" data-bs-placement="top" title="downvo
+                                te" style="margin: 5px; color: #eae7e748;" >
                                         <i class="far fa-caret-square-down" style="font-size: 33px;"></i>
                                 </a>
 
@@ -190,6 +200,10 @@
     }
     function successFull(){
         confirm("Report Successfull");
+    }
+
+    function saveSuccessfull(){
+        confirm("Save Successfull");
     }
 
 </script>
