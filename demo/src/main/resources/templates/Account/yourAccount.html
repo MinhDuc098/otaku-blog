@@ -71,19 +71,28 @@
             <!-- forth row -->
 
             <div id="changePass" style=" margin-bottom: 40px;">
-                <h2 th:text="${thong_bao}">  </h2>
-                <div class="col-md-12" style="margin-top: 15px;">
-                    <label for="" class="text-light" style="padding: 10px 10px 10px 0px;  font-weight: bold;">Password</label>
-                    <input id="oldPassword" name="password" type="password" class="form-control w-50" style="border-radius:25px; background-color: #111111; color: rgba(192, 187, 187, 0.899);" th:value="${User.userPassword}" required>
+
+                <div class="col-md-12" style="margin-top: 26px;">
+
+<!--                    <input id="oldPassword" name="password" type="password" class="form-control w-50" style="border-radius:25px; background-color: #111111; color: rgba(192, 187, 187, 0.899);" th:value="${User.userPassword}" required>-->
+
+                    <button class="btn btn-warning">
+                        <a class="text-decoration-none" style="color: #1d1c1c" th:href="@{./toChangePassword(id = ${User.userId})}">
+                        Change Your Password
+                        </a>
+                    </button>
+
+
+
                 </div>
 
 
-                <div style="margin-top: 15px;">
+<!--                <div style="margin-top: 15px;">-->
 
-                    <input type="checkbox" id="showPass" onclick="showPassWord()"/> 
-                    <label for="showPass" class="text-light"> hiển thị mật khẩu </label>
-                    
-                </div>
+<!--                    <input type="checkbox" id="showPass" onclick="showPassWord()"/> -->
+<!--                    <label for="showPass" class="text-light"> hiển thị mật khẩu </label>-->
+<!--                    -->
+<!--                </div>-->
             </div>
             <!-- end forth row -->
             <div>

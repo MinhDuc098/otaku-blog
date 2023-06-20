@@ -82,6 +82,10 @@ public class BlogController {
     public String removeSavedPost(int id, HttpSession session, RedirectAttributes attributes){
         return viewBlogService.removeSavedPost(id,session, attributes);
     }
+    @GetMapping(path = "/shareByFacebook")
+    public String shareByFacebook(String url){
+        return viewBlogService.shareByFacebook(url);
+    }
 
 }
 

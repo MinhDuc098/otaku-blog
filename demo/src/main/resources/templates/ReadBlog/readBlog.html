@@ -8,22 +8,46 @@
 <body style="background-color: #111111;">
 <div th:insert="fragments/header.html :: navigationBar"></div>
 
+
     <!-- end slider -->
     <div class="container" style="background-color: #2A2A2A; margin-top: 100px;">
+
+        <div class="text-end"
+             style="display: none;
+                    position: fixed;
+                    bottom: 8%;
+                    right: 10%;"
+             id="toTop" onclick="toTop()">
+            <button style="background-color: #2A2A2A">
+                <i style="font-size: 40px; padding: 10px;color: #f0e3e3"class="fas fa-arrow-alt-circle-up" ></i>
+            </button>
+        </div>
+
         <div style="width: 50%;margin-left: auto; margin-right: auto; padding-top: 50px; padding-bottom: 60px;" >
 <!--                <img th:src="@{${post.postImg}}" alt="">-->
 
-                <div style="margin-bottom: 30px">
-                    <a th:href="@{./savePost(postId = ${post.postId})}">
+                <div style="margin-bottom: 30px" class="row">
+
+                    <a class="col-md-7" th:href="@{./savePost(postId = ${post.postId})}">
                     <button class="btn btn-success btn-outline-dark" style="color: rgb(232, 221, 221);" onclick="saveSuccessfull()">
                         <i class="fas fa-chess"></i>
                         Lưu Bài Viết
                     </button>
                     </a>
+
+
+                    <a class="col-md-5 text-end" th:href="@{./shareByFacebook(url = ${url})}">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plane">  </i>
+                            Chia Sẻ Bài Viết
+                        </button>
+                    </a>
+
                 </div>
                 <div th:each="cate:${post.listCategory}" style="display: inline;">
-                <span style="color: rgba(232,221,221,0.68); font-size: 18px; margin-right: 8%" th:text="${cate.categoryName} "> </span>
-
+                    <a class="text-decoration-none" th:href="@{./searchByCategory?id={id}(id=${cate.categoryId})}">
+                        <span style="color: rgba(232,221,221,0.68); font-size: 18px; margin-right: 8%" th:text="${cate.categoryName} "> </span>
+                    </a>
                 </div>
                 <h1 class="text-justify" style="color: rgb(232, 221, 221); margin-top: 20px" th:text="${post.postTitle}">   </h1>
 
@@ -202,9 +226,27 @@
         confirm("Report Successfull");
     }
 
-    function saveSuccessfull(){
+    function saveSuccessfull() {
         confirm("Save Successfull");
     }
+
+
+    window.onscroll = function()  {
+        var scrollButton = document.getElementById('toTop');
+        if (window.pageYOffset > 0) {
+            scrollButton.style.display = 'block';
+        } else {
+            scrollButton.style.display = 'none';
+        }
+    }
+
+    function toTop(){
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+
+
+
 
 </script>
 </body>

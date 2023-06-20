@@ -4,6 +4,7 @@ import com.example.demo.model.User;
 import com.example.demo.service.LoginService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ public class LoginController {
 
     @Autowired
     private LoginService LoginService;
+
 
     @GetMapping(path = "/tologin")
     public String toLoginPage(Model model){
@@ -27,9 +29,9 @@ public class LoginController {
     }
 
     @PostMapping(path = "/login")
-    public String Login(String password, String username,HttpSession session){
+    public String Login(String password, String email,HttpSession session){
 
-        return LoginService.login(username, password,session );
+        return LoginService.login(email, password,session );
     }
 
     @PostMapping(path = "/forgotPassword")

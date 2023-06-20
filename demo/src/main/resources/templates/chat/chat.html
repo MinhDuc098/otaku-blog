@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<!--    <meta charset="UTF-8">-->
+<!--    <meta http-equiv="X-UA-Compatible" content="IE=edge">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+
+
+<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css">-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.min.js"></script>-->
+
+    <title>chat</title>
+	<link th:href="@{/style/chat.css}" rel="stylesheet" >
+
+
+	<th:block th:insert="fragments/header.html :: head"> </th:block>
+</head>
+
+<body style="background-color: #111111;">
+
+
+
+<main class="content" >
+
+<th:block th:insert="fragments/header.html :: navigationBar"></th:block>
+
+<div class="container p-0"style="background-color: #2A2A2A; margin-top: 40px">
+
+
+
+		<div class="card">
+			<div class="row g-0">
+				<div class="col-12 col-lg-5 col-xl-3 border-right">
+
+					<div class="px-4 d-none d-md-block">
+						<div class="d-flex align-items-center">
+							<form class="flex-grow-1" th:action="@{./searchUserByUserName}" method="post">
+								<input type="text" name="userName" class="form-control my-3" placeholder="Search User..."/>
+								<button class="btn btn-success"> search </button>
+							</form>
+						</div>
+					</div>
+					<div th:each="user:${userFounds}" >
+					<a th:href="@{./selectUserChat(userId=${user.userId})}"
+					   class="list-group-item list-group-item-action border-0 "
+
+
+					>
+
+						<div class="badge bg-success float-right">5</div>
+						<div class="d-flex align-items-start">
+							<img th:src="@{${user.userImg == null?'/img/alexia.jpg':user.userImg}}" class="rounded-circle mr-1" alt="Vanessa Tucker" width="40" height="40">
+							<div class="flex-grow-1 ml-3" th:text="${user.userName}">
+								Vanessa Tucker
+								<div class="small"><span class="fas fa-circle chat-online"></span> Online</div>
+							</div>
+						</div>
+					</a>
+
+					</div>
+
+
+
+
+
+
+					<hr class="d-block d-lg-none mt-1 mb-0">
+				</div>
+<!--				if user chat selected-->
+				<div class="col-12 col-lg-7 col-xl-9" th:if="${userChat!=null}">
+					<div class="py-2 px-4 border-bottom d-none d-lg-block">
+						<div class="d-flex align-items-center py-1">
+							<div class="position-relative">
+								<img th:src="@{${userChat.userImg == null?'/img/alexia.jpg':userChat.userImg}}" class="rounded-circle mr-1"  width="40" height="40">
+							</div>
+							<div class="flex-grow-1 pl-3">
+								<strong th:text="${userChat.userName}">Sharon Lessman</strong>
+								<div class="text-muted small"><em>Typing...</em></div>
+							</div>
+
+						</div>
+					</div>
+
+					<div class="position-relative">
+						<div class="chat-messages p-4" id="chatWindow">
+
+
+<!--comment-->
+							<div
+								 th:each="mess:${messages}"
+
+								 th:class="${mess.senderId == userChat.userId?'chat-message-left pb-4':'chat-message-right pb-4' }"
+							>
+								<div>
+<!--									<img th:src="@{${userChat.userImg == null?'/img/alexia.jpg':userChat.userImg}}" class="rounded-circle mr-1" alt="Sharon Lessman" width="40" height="40">-->
+									<div class="text-muted small text-nowrap mt-2" th:text="${mess.createdAt}">
+										2:39 am
+									</div>
+								</div>
+								<div class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3"
+									 th:text="${mess.messageContent}"
+								>
+<!--									<div class="font-weight-bold mb-1" th:text="${userChat.userName}">Sharon Lessman</div>-->
+									Sit meis deleniti eu, pri vidit meliore docendi ut, an eum erat animal commodo.
+								</div>
+							</div>
+
+
+<!--end comment-->
+
+						</div>
+					</div>
+
+
+<!--					chat room id-->
+					<input id="chatRoomId" th:value="${chatRoom.chatRoomId}" hidden />
+					<input id="senderId" th:value="${session.userID}" hidden/>
+
+					<div class="flex-grow-0 py-3 px-4 border-top">
+						<div class="input-group">
+							<img th:src="@{${session.userImg == null?'/img/alexia.jpg':session.userImg}}" class="rounded-circle mr-1" alt="Chris Wood" width="40" height="40">
+							<input type="text" class="form-control" placeholder="Type your message" id="messageInput">
+							<button class="btn btn-primary" onclick="sendMessage()">Send</button>
+
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script  th:src="@{/js/chat.js}"></script>
+</body>
+</html>

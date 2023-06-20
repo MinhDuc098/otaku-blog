@@ -35,12 +35,17 @@ public class HomeController {
     public String loadhomePage(HttpSession session, Model model, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "") String followStatus){
         List<Category> listCategory = homeService.getListCategory();
         Page<Post> page = homeService.getPostByOffset(pageNo,pageSize);
-        List<User> Users = userRepository.findAll();
+        List<User> Users = userRepository.findTop3ByOrderByNumberFollowerDesc();
         List<Post> prominentPosts = homeService.getAllPost();
         if(session.getAttribute("userID")!= null){
             User user = userRepository.findById((int)session.getAttribute("userID")).orElseThrow();
             model.addAttribute("userNotify",user.getUserNotification());
+
+            if((int)session.getAttribute("userAuthor") == 5){
+                model.addAttribute("adminNotify",user.getAdminNotification());
+            }
         }
+
 
 
         model.addAttribute("prominentPosts",prominentPosts);

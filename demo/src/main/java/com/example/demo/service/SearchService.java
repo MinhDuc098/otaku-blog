@@ -33,11 +33,15 @@ public class SearchService {
         Pageable pageable = PageRequest.of(pageNo,pageSize);
         Page<Post> pagePost = postRepository.getAllPostByName(name,pageable);
         List<Category> listCategory = categoryRepository.findAll();
-        List<User> Users = userRepository.findAll();
+        List<User> Users = userRepository.findTop3ByOrderByNumberFollowerDesc();
 
         if(session.getAttribute("userID")!= null){
             User user = userRepository.findById((int)session.getAttribute("userID")).orElseThrow();
             model.addAttribute("userNotify",user.getUserNotification());
+
+            if((int)session.getAttribute("userAuthor") == 5){
+                model.addAttribute("adminNotify",user.getAdminNotification());
+            }
         }
         model.addAttribute("listCategory",listCategory);
         model.addAttribute("users",Users);

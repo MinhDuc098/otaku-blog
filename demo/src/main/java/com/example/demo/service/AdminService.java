@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -128,7 +129,7 @@ public class AdminService {
         else {
             if((int)session.getAttribute("userAuthor") >= 4){
                 User admin = userRepository.findById((int)session.getAttribute("userID")).orElseThrow();
-                admin.setUserNotification(0);
+                admin.setAdminNotification(0);
                 List<ReportUser> reportUsers = reportUserRepository.findAllByOrderByCreatedAtDesc();
                 List<Report> reports = reportRepository.findAllByOrderByCreatedAtDesc();
 
@@ -205,9 +206,18 @@ public class AdminService {
             if((int)session.getAttribute("userAuthor") == 5){
 
                 Notification notification = new Notification();
-                notification.setNotificationContent(notficationContent);
+                LocalDateTime now = LocalDateTime.now();
+                User userRelate = userRepository.findById((int)session.getAttribute("userID")).orElseThrow();
                 User userReceiver = userRepository.findById(receiverId).orElseThrow();
+
+//               create notification
+                notification.setNotificationContent(notficationContent);
                 notification.setUserReceiverNotification(userReceiver);
+                notification.setCreatedAt(now);
+                notification.setUserRelate(userRelate);
+
+//              create notice new notification for user
+                userReceiver.setUserNotification(userReceiver.getUserNotification()+1);
 
                 notificationRepository.save(notification);
 

@@ -24,4 +24,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("select user from User user where user.userAuthor = 5")
     public List<User> getAllAdmin();
+
+    public List<User> findTop3ByOrderByNumberFollowerDesc();
+
+    public User findUserByUserEmail(String email);
+
+    @Query("select user from User user where user.userName like %?1% order by user.userId")
+    public List<User> findUserByUserName(String userName);
 }

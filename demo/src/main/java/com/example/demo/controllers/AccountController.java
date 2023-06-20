@@ -15,6 +15,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -47,6 +48,9 @@ public class AccountController {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    public BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @GetMapping(path = "/toYourAccount")
     public String toAccount(HttpSession session,@RequestParam int id, Model model){
         if(session.getAttribute("userID")!= null) {
@@ -70,7 +74,7 @@ public class AccountController {
     @PostMapping(path = "/updateAccount")
     public String updateAccount(int id, String describe,
                                       String username, String email,
-                                      LocalDateTime dateofbirth, String password, RedirectAttributes attributes,
+                                      LocalDateTime dateofbirth, RedirectAttributes attributes,
                                       MultipartFile img){
         Optional<User> user = userRepository.findById(id);
         user.ifPresent(u-> {
@@ -79,14 +83,19 @@ public class AccountController {
                     "overwrite", true
             );
             try {
-                Map result = cloudinary.uploader().upload(img.getBytes(), params);
+                if(!img.isEmpty()){
+                    Map result = cloudinary.uploader().upload(img.getBytes(), params);
+                    u.setUserImg(result.get("url").toString());
+                }
 
-                u.setUserImg(result.get("url").toString());
+
+
+
                 u.setUserDescription(describe);
                 u.setUserName(username);
                 u.setUserEmail(email);
                 u.setUserDateOfBirth(dateofbirth);
-                u.setUserPassword(password);
+
                 userRepository.save(u);
 
             } catch (IOException e) {
@@ -117,7 +126,7 @@ public class AccountController {
             reportUserRepository.save(reportUser);
             List<User> listAdmin = userRepository.getAllAdmin();
             for (User admin: listAdmin) {
-                admin.setUserNotification(admin.getUserNotification()+1);
+                admin.setAdminNotification(admin.getAdminNotification()+1);
             }
 
             attributes.addAttribute("authorId",userId);

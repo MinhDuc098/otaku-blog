@@ -49,6 +49,12 @@ public class User {
     @Column(name = "user_Notification")
     private int userNotification;
 
+    @Column(name = "admin_Notification")
+    private int adminNotification;
+
+    @Column(name = "number_follower")
+    private int numberFollower;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Post> post = new HashSet<>();
 
@@ -74,6 +80,9 @@ public class User {
 
     @OneToMany(mappedBy = "userRelate")
     private List<Notification> notificationList;
+
+    @OneToMany(mappedBy = "userSender")
+    private List<Chatroom> chatrooms;
 
 
     public Set<Report> getReports() {
@@ -180,6 +189,22 @@ public class User {
         this.userNotification = userNotification;
     }
 
+    public int getAdminNotification() {
+        return adminNotification;
+    }
+
+    public void setAdminNotification(int adminNotification) {
+        this.adminNotification = adminNotification;
+    }
+
+    public int getNumberFollower() {
+        return numberFollower;
+    }
+
+    public void setNumberFollower(int numberFollower) {
+        this.numberFollower = numberFollower;
+    }
+
     public List<ReportUser> getReportsMade() {
         return reportsMade;
     }
@@ -219,5 +244,13 @@ public class User {
 
     public void setNotificationList(List<Notification> notificationList) {
         this.notificationList = notificationList;
+    }
+
+    public List<Chatroom> getChatrooms() {
+        return chatrooms;
+    }
+
+    public void setChatrooms(List<Chatroom> chatrooms) {
+        this.chatrooms = chatrooms;
     }
 }

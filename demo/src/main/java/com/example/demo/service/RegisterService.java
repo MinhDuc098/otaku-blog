@@ -6,6 +6,7 @@ import com.example.demo.model.User;
 import com.example.demo.repositories.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
@@ -14,6 +15,9 @@ import java.util.Random;
 public class RegisterService {
     @Autowired
     public UserRepository userRepository;
+
+    @Autowired
+    public BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
     private EmailSenderService emailSenderService;
@@ -33,7 +37,7 @@ public class RegisterService {
         emailSenderService.sendMail(email,"YOUR PASSWORD:","here is your password "+password);
         User u = new User();
                 u.setUserName(username);
-                u.setUserPassword(password);
+                u.setUserPassword(bCryptPasswordEncoder.encode(password));
                 u.setUserEmail(email);
                 u.setUserAuthor(1);
                 u.setUserImg("/img/alexia.jpg");

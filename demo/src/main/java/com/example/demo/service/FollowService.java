@@ -38,6 +38,7 @@ public class FollowService {
                 f.setUserId(userid);
                 followRepository.save(f);
 
+//              sent notification to user
                 User userFollowed = userRepository.findById(userid).orElseThrow();
                 User userFollowing = userRepository.findById((int)session.getAttribute("userID")).orElseThrow();
 
@@ -50,13 +51,16 @@ public class FollowService {
                 notification.setNotificationContent(message);
                 notification.setUserRelate(userFollowing);
 
+//              save notification
                 notificationRepository.save(notification);
+                userFollowed.setNumberFollower(userFollowed.getNumberFollower()+1);
                 userFollowed.setUserNotification(userFollowed.getUserNotification()+1);
 
             }
             else{
                 followRepository.delete(follow);
-
+                User userFollowed = userRepository.findById(userid).orElseThrow();
+                userFollowed.setNumberFollower(userFollowed.getNumberFollower()-1);
             }
             return "redirect:"+link;
         }

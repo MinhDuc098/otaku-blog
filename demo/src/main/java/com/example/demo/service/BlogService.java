@@ -78,7 +78,12 @@ public class BlogService {
             User u = userRepository.findById(viewerid).orElseThrow();
             model.addAttribute("userNotify",u.getUserNotification());
 
+            if((int)session.getAttribute("userAuthor") == 5){
+                model.addAttribute("adminNotify",user.getAdminNotification());
+            }
         }
+//        get url of post
+        String url = "viewBlog?id="+id;
 
 
 //      get vote = upvote - downvote
@@ -99,7 +104,7 @@ public class BlogService {
         model.addAttribute("post",post);
         model.addAttribute("user",user);
         model.addAttribute("vote",vote);
-
+        model.addAttribute("url",url);
         return "ReadBlog/readBlog";
     }
 
@@ -229,6 +234,10 @@ public class BlogService {
             int userid = (int)session.getAttribute("userID");
             User user = userRepository.findById(userid).orElseThrow();
             model.addAttribute("userNotify", user.getUserNotification());
+
+            if((int)session.getAttribute("userAuthor") == 5){
+                model.addAttribute("adminNotify",user.getAdminNotification());
+            }
 //
 //            p.setUser(user);
             p.setDownVote(0);
@@ -291,7 +300,7 @@ public class BlogService {
         if(session.getAttribute("userID") != null){
 
             List<Category> listCategory = categoryRepository.findAll();
-            User user = userRepository.findById((int)session.getAttribute("userID")).orElseThrow(()-> new EntityNotFoundException("not found user"));
+            User user = userRepository.findById((int)session.getAttribute("userID")).orElseThrow();
 
             Pageable pageable = PageRequest.of(pageNo, pageSize);
             Page<Post> userPost = postRepository.getAllPostByUser((int)session.getAttribute("userID"),pageable);
@@ -312,7 +321,9 @@ public class BlogService {
                 User u = userRepository.findById(numUserYouFollowing.get(i)).orElseThrow();
                 userFolloweds.add(u);
             }
-
+            if((int)session.getAttribute("userAuthor") == 5){
+                model.addAttribute("adminNotify",user.getAdminNotification());
+            }
             model.addAttribute("userNotify", user.getUserNotification());
             model.addAttribute("Followers",Followers);
             model.addAttribute("userFolloweds",userFolloweds);
@@ -359,6 +370,9 @@ public class BlogService {
             }
             User u = userRepository.findById((int)session.getAttribute("userID")).orElseThrow();
             model.addAttribute("userNotify", u.getUserNotification());
+            if((int)session.getAttribute("userAuthor") == 5){
+                model.addAttribute("adminNotify",u.getAdminNotification());
+            }
         }
 
 
@@ -399,7 +413,7 @@ public class BlogService {
 //            add notification for admins
             List<User> listAdmin = userRepository.getAllAdmin();
             for (User admin: listAdmin) {
-                admin.setUserNotification(admin.getUserNotification()+1);
+                admin.setAdminNotification(admin.getAdminNotification()+1);
             }
 
             attributes.addAttribute("id",id);
@@ -451,7 +465,9 @@ public class BlogService {
             List<Category> listCategory = categoryRepository.findAll();
 
 
-
+            if((int)session.getAttribute("userAuthor") == 5){
+                model.addAttribute("adminNotify",u.getAdminNotification());
+            }
             model.addAttribute("userNotify", u.getUserNotification());
             model.addAttribute("numPage",saveposts.getTotalPages());
             model.addAttribute("currentPage", pageNo);
@@ -472,5 +488,10 @@ public class BlogService {
         }
         session.setAttribute("message","You have to login to do it");
         return "Login/login";
+    }
+
+    public String shareByFacebook(String url) {
+//        return "redirect:https://www.facebook.com/dialog/feed?app_id=<APP_ID>&display=popup&link=<URL>&redirect_uri=" + url;
+        return "redirect:https://www.facebook.com/dialog/feed?app_id=<APP_ID>&display=popup&link="+ url +"&redirect_uri=<REDIRECT_URI>";
     }
 }
