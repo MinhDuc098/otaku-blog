@@ -18,6 +18,7 @@
 <div class="container" style="padding: 25px; background-color: #2A2A2A; margin-top: 40px;">
     <p th:if="${prominentPosts != null}" style="text-transform: uppercase; font-weight: bold; font-size: 20px; padding-bottom: 20px; color: azure;"> Bài viết nổi bật </p>
     <p th:text="${category}" style="text-transform: uppercase; font-weight: bold; font-size: 20px; padding-bottom: 20px; color: azure;">  </p>
+    <h3 th:text="${session.email}"></h3>
 
     <div class="owl-carousel owl-theme" >
         <div class="item" th:each="post:${prominentPosts}">

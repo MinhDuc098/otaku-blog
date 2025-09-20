@@ -24,7 +24,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         // Retrieve user details from your user repository or database using email
         User user = userRepository.findByEmail(email);
-
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found with email: " + email);
+        }
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
 
         if (user.getUserAuthor() == 5) {
@@ -32,13 +34,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         } else {
             grantedAuthorities.add(new SimpleGrantedAuthority("USER"));
         }
-
+        boolean enabled = (user.getUserBanned() == 0);
 
         // Create a UserDetails object based on the retrieved user details
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUserEmail())
                 .password(user.getUserPassword()) // Make sure the stored password is already encoded
                 .authorities(grantedAuthorities)
+                .disabled(!enabled)
                 .build();
     }
 }

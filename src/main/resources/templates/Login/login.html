@@ -12,9 +12,11 @@
     <div class="form-value">
       <form action="#" th:action="@{./login}"  method="post" id="login">
         <h2>Login</h2>
-        <h3 style="color: red; text-align: center" th:text="${session.message}" >  </h3>
-
-<!--        <h3 style="color: red; text-align: center" th:text="${session.email}" >  </h3>-->
+        <!-- Error message -->
+        <h3 style="color: red; text-align: center"
+            th:if="${param.error}"
+            th:text="${session.error_message}">
+        </h3>
         <div class="inputbox">
           <ion-icon name="mail-outline"></ion-icon>
           <input type="password" th:name="password"  required>

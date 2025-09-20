@@ -38,7 +38,6 @@ public class LoginService {
        final User u =  UserRepository.findUserByUserEmail(email);
        if(u != null){
 
-
                if(bCryptPasswordEncoder.matches(password,u.getUserPassword())){
                    if(u.getUserBanned()==0) {
                        session.setAttribute("email", u.getUserEmail());
