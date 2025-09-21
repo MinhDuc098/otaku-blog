@@ -7,6 +7,9 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -52,6 +55,7 @@ public class BlogService {
     @Autowired
     private SavePostRepository savePostRepository;
 
+    @Cacheable(value = "posts", key = "#id")
     public String viewPost(int id,Model model,HttpSession session){
         List<Category> listCategory = homeService.getListCategory();
         Post post = postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Post not found"));
@@ -262,7 +266,7 @@ public class BlogService {
         }
         return null;
     }
-
+//    @CachePut(value = "posts", key = "#post.id")
     public String addNewBlog(Post post,RedirectAttributes attributes,Set<Integer> categories,HttpSession session) {
         LocalDateTime now = LocalDateTime.now();
 
@@ -341,6 +345,7 @@ public class BlogService {
         return "ManageYourBlog/listBlog";
     }
 
+    @CacheEvict(value = "posts", key = "#id")
     public String deleteYourPost(int id,HttpSession session) {
         if(session.getAttribute("userID")!= null){
             Post post = postRepository.findById(id).orElseThrow();
